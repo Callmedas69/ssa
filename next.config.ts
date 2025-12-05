@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Empty turbopack config to silence warning, build with webpack for WalletConnect compatibility
+  turbopack: {},
+  webpack: (config) => {
+    config.externals.push('pino-pretty', 'lokijs', 'encoding');
+    return config;
+  },
 };
 
 export default nextConfig;
