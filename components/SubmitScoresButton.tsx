@@ -1,9 +1,11 @@
-'use client';
+"use client";
 
-import { useAccount } from 'wagmi';
-import { Button } from '@/components/ui/button';
-import { useSubmitScores } from '@/hooks/useSubmitScores';
-import { Loader2, Check, AlertCircle, ExternalLink } from 'lucide-react';
+import { useAccount } from "wagmi";
+import { Button } from "@/components/ui/button";
+import { useSubmitScores } from "@/hooks/useSubmitScores";
+import { MintProfileButton } from "@/components/MintProfileButton";
+import { CountdownTimer } from "@/components/CountdownTimer";
+import { Loader2, Check, AlertCircle, ExternalLink } from "lucide-react";
 
 interface SubmitScoresButtonProps {
   disabled?: boolean;
@@ -15,60 +17,65 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
     state,
     error,
     txHash,
+    nextAllowedTime,
     fetchSignature,
     submitToChain,
     reset,
+    checkSubmissionStatus,
   } = useSubmitScores();
 
-  // Check if contract is configured
-  const contractConfigured = !!process.env.NEXT_PUBLIC_SSA_ATTESTATOR_ADDRESS;
+  // Contract is deployed - no configuration check needed
 
   const handleClick = async () => {
-    if (state === 'idle' || state === 'error') {
+    if (state === "idle" || state === "error") {
       await fetchSignature();
-    } else if (state === 'ready') {
+    } else if (state === "ready") {
       await submitToChain();
-    } else if (state === 'success') {
+    } else if (state === "success" || state === "cooldown") {
       reset();
     }
+  };
+
+  const handleCountdownComplete = () => {
+    checkSubmissionStatus();
   };
 
   // Button content based on state
   const getButtonContent = () => {
     switch (state) {
-      case 'idle':
-        return 'Attest On-Chain';
-      case 'signing':
+      case "idle":
+        return "Attest On-Chain";
+      case "signing":
         return (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Preparing...
           </>
         );
-      case 'ready':
-        return 'Confirm Transaction';
-      case 'submitting':
+      case "ready":
+        return "Confirm Transaction";
+      case "submitting":
         return (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Submitting...
           </>
         );
-      case 'confirming':
+      case "confirming":
         return (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Confirming...
           </>
         );
-      case 'success':
+      case "success":
         return (
           <>
             <Check className="mr-2 h-4 w-4" />
             Attested!
           </>
         );
-      case 'error':
+      case "error":
         return (
           <>
             <AlertCircle className="mr-2 h-4 w-4" />
@@ -76,31 +83,70 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
           </>
         );
       default:
-        return 'Attest On-Chain';
+        return "Attest On-Chain";
     }
   };
 
-  const isLoading = state === 'signing' || state === 'submitting' || state === 'confirming';
-  const isDisabled = !isConnected || !contractConfigured || isLoading || disabled;
+  const isLoading =
+    state === "signing" || state === "submitting" || state === "confirming";
+  const isDisabled =
+    !isConnected || isLoading || disabled || state === "cooldown";
 
   return (
     <div className="space-y-2">
+      {/* Show countdown timer when in cooldown */}
+      {state === "cooldown" && nextAllowedTime && (
+        <div className="p-3 bg-muted rounded-lg border border-border">
+          <CountdownTimer
+            targetTime={nextAllowedTime}
+            onComplete={handleCountdownComplete}
+          />
+        </div>
+      )}
+
       <Button
         onClick={handleClick}
         disabled={isDisabled}
-        variant={state === 'success' ? 'secondary' : state === 'error' ? 'destructive' : 'default'}
+        variant={
+          state === "success"
+            ? "secondary"
+            : state === "error"
+            ? "destructive"
+            : "default"
+        }
         className="w-full"
       >
         {getButtonContent()}
       </Button>
 
-      {/* Error message */}
+      {/* Error message with better formatting */}
       {error && (
-        <p className="text-sm text-destructive text-center">{error}</p>
+        <div className="space-y-1">
+          <p className="text-sm text-destructive text-center font-medium">
+            {error}
+          </p>
+          {error.includes("provider") && (
+            <p className="text-xs text-muted-foreground text-center">
+              This may indicate a configuration issue. Please contact support if
+              the problem persists.
+            </p>
+          )}
+          {error.includes("paused") && (
+            <p className="text-xs text-muted-foreground text-center">
+              The contract is temporarily paused. Please check back later.
+            </p>
+          )}
+          {error.includes("24 hours") && (
+            <p className="text-xs text-muted-foreground text-center">
+              You can only submit scores once per day. Please wait before trying
+              again.
+            </p>
+          )}
+        </div>
       )}
 
       {/* Transaction link */}
-      {txHash && state === 'success' && (
+      {txHash && state === "success" && (
         <a
           href={`https://basescan.org/tx/${txHash}`}
           target="_blank"
@@ -112,11 +158,16 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
         </a>
       )}
 
-      {/* Not configured warning */}
-      {!contractConfigured && (
-        <p className="text-xs text-muted-foreground text-center">
-          Contract not deployed yet
-        </p>
+      {/* Mint Profile Button - shown after successful attestation OR during cooldown */}
+      {(state === "success" || state === "cooldown") && (
+        <div className="mt-4 pt-4 border-t border-border">
+          <p className="text-sm text-center text-muted-foreground mb-3">
+            {state === "success"
+              ? "🎉 Scores attested! Now mint your Profile NFT:"
+              : "Mint your Profile NFT:"}
+          </p>
+          <MintProfileButton />
+        </div>
       )}
     </div>
   );

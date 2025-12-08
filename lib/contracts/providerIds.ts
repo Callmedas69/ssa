@@ -2,13 +2,16 @@ import { keccak256, toBytes } from 'viem';
 
 /**
  * Provider ID constants for on-chain attestation.
- * These must match the bytes32 values registered in SocialScoreAttestator.
+ * IMPORTANT: These MUST match the contract constants exactly.
+ * The deployed contract uses provider IDs WITH underscores (e.g., "TALENT_BUILDER").
+ * 
+ * Verified against deployed contract at 0xf02419b54aedd2c215feeb3eeedbf5ac30741dad
  */
 export const PROVIDER_IDS = {
   ETHOS: keccak256(toBytes('ETHOS')),
   NEYNAR: keccak256(toBytes('NEYNAR')),
-  TALENT_BUILDER: keccak256(toBytes('TALENT_BUILDER')),
-  TALENT_CREATOR: keccak256(toBytes('TALENT_CREATOR')),
+  TALENT_BUILDER: keccak256(toBytes('TALENT_BUILDER')), // WITH underscore as per contract
+  TALENT_CREATOR: keccak256(toBytes('TALENT_CREATOR')), // WITH underscore as per contract
   PASSPORT: keccak256(toBytes('PASSPORT')),
   QUOTIENT: keccak256(toBytes('QUOTIENT')),
 } as const;

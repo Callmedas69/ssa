@@ -1,50 +1,37 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { base } from 'viem/chains';
-import { type Hex } from 'viem';
-import { SOCIAL_SCORE_ATTESTATOR_ABI } from '@/lib/contracts/abi';
-import type { SignedScorePayload } from '@/lib/contracts/eip712';
+import { useState, useCallback, useEffect } from "react";
+import { writeContract, simulateContract, waitForTransactionReceipt } from "wagmi/actions";
+import { wagmiConfig } from "@/lib/wagmi/config";
+import { useAccount } from "wagmi";
 
-type SubmitState = 'idle' | 'signing' | 'ready' | 'submitting' | 'confirming' | 'success' | 'error';
+import { CONTRACTS } from "@/abi/addresses";
+import { SocialScoreAttestatorABI } from "@/abi/SocialScoreAttestator";
 
-interface UseSubmitScoresResult {
-  state: SubmitState;
-  error: string | null;
-  txHash: Hex | null;
-  signedPayload: SignedScorePayload | null;
-  fetchSignature: () => Promise<void>;
-  submitToChain: () => Promise<void>;
-  reset: () => void;
-}
+import {
+  validateProvidersOnChain,
+  isContractPaused,
+} from "@/lib/contracts/providerValidation";
+import { PROVIDER_ID_MAP } from "@/lib/contracts/providerIds";
+import { getPublicClient } from "wagmi/actions";
 
-export function useSubmitScores(): UseSubmitScoresResult {
-  const { address, isConnected } = useAccount();
+import type { Hex } from "viem";
+import type { ScorePayload } from "@/lib/types";
+
+type SubmitState = 'idle' | 'signing' | 'ready' | 'submitting' | 'confirming' | 'success' | 'error' | 'cooldown';
+
+export function useSubmitScores() {
+  const { address } = useAccount();
   const [state, setState] = useState<SubmitState>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [signedPayload, setSignedPayload] = useState<SignedScorePayload | null>(null);
-
-  const { writeContract, data: txHash, isPending: isWritePending } = useWriteContract();
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash: txHash,
-  });
-
-  // Update state based on transaction status
-  if (isWritePending && state !== 'submitting') {
-    setState('submitting');
-  }
-  if (isConfirming && state !== 'confirming') {
-    setState('confirming');
-  }
-  if (isConfirmed && state !== 'success') {
-    setState('success');
-  }
+  const [txHash, setTxHash] = useState<Hex | null>(null);
+  const [signedPayload, setSignedPayload] = useState<{ payload: ScorePayload; signature: Hex } | null>(null);
+  const [lastSubmissionTime, setLastSubmissionTime] = useState<number | null>(null);
+  const [nextAllowedTime, setNextAllowedTime] = useState<number | null>(null);
 
   const fetchSignature = useCallback(async () => {
-    if (!isConnected || !address) {
-      setError('Wallet not connected');
+    if (!address) {
+      setError("Wallet not connected");
       setState('error');
       return;
     }
@@ -53,71 +40,202 @@ export function useSubmitScores(): UseSubmitScoresResult {
     setError(null);
 
     try {
-      const response = await fetch(`/api/sign-scores?address=${address}`);
-      const result = await response.json();
-
-      if (!result.success || !result.data) {
-        throw new Error(result.error || 'Failed to fetch signature');
+      // 1. Contract paused?
+      const paused = await isContractPaused();
+      if (paused) {
+        throw new Error("Score submission is currently paused.");
       }
 
-      setSignedPayload(result.data);
+      // 2. Check last submission time to prevent unnecessary API calls
+      const publicClient = getPublicClient(wagmiConfig);
+      const lastUpdated = await publicClient.readContract({
+        address: CONTRACTS.SocialScoreAttestator as `0x${string}`,
+        abi: SocialScoreAttestatorABI,
+        functionName: "lastUpdated",
+        args: [address],
+      });
+
+      if (lastUpdated) {
+        const now = Math.floor(Date.now() / 1000);
+        const MIN_INTERVAL = 86400; // 24 hours
+        const nextAllowedTime = Number(lastUpdated) + MIN_INTERVAL;
+        
+        if (now < nextAllowedTime) {
+          const hoursRemaining = Math.ceil((nextAllowedTime - now) / 3600);
+          const timeRemaining = hoursRemaining > 1 ? `${hoursRemaining} hours` : `${Math.ceil((nextAllowedTime - now) / 60)} minutes`;
+          const nextAllowedDate = new Date(nextAllowedTime * 1000).toLocaleString();
+          throw new Error(`You can only submit scores once every 24 hours. Please wait ${timeRemaining}. Next submission available at: ${nextAllowedDate}`);
+        }
+      }
+
+      // 3. Fetch scores from backend
+      const scoresRes = await fetch(`/api/scores?address=${address}`);
+      if (!scoresRes.ok) throw new Error("Failed to fetch scores");
+
+      const scoresData = await scoresRes.json();
+      if (!scoresData.success || !scoresData.data) {
+        throw new Error("No scores available");
+      }
+
+      // 4. Build payload
+      interface BreakdownItem {
+        provider: string;
+        normalizedScore: number;
+      }
+      const payload: ScorePayload = {
+        user: address,
+        ssaIndex: Math.round(scoresData.data.ssaIndex.score),
+        providers: scoresData.data.ssaIndex.breakdown.map((b: BreakdownItem) => PROVIDER_ID_MAP[b.provider]),
+        scores: scoresData.data.ssaIndex.breakdown.map((b: BreakdownItem) => Math.round(b.normalizedScore)),
+        timestamp: Math.floor(Date.now() / 1000),
+      };
+
+      // 5. Validate providers
+      const providerValidation = await validateProvidersOnChain(payload.providers);
+      if (!providerValidation.valid) {
+        throw new Error(
+          `Invalid providers: ${providerValidation.invalidProviders.join(", ")}`
+        );
+      }
+
+      // 5. Request backend for EIP-712 signature
+      const sigRes = await fetch("/api/sign-scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!sigRes.ok) throw new Error("Backend signature failed");
+
+      const { signature } = await sigRes.json();
+
+      setSignedPayload({ payload, signature });
       setState('ready');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch signature');
+      const message =
+        err instanceof Error ? err.message : "Unknown error preparing signature";
+      setError(message);
       setState('error');
     }
-  }, [address, isConnected]);
+  }, [address]);
 
   const submitToChain = useCallback(async () => {
     if (!signedPayload) {
-      setError('No signed payload available');
+      setError("No signed payload available");
       setState('error');
       return;
     }
 
-    const contractAddress = process.env.NEXT_PUBLIC_SSA_ATTESTATOR_ADDRESS;
-    if (!contractAddress) {
-      setError('Contract address not configured');
-      setState('error');
-      return;
-    }
+    setState('submitting');
+    setError(null);
 
     try {
-      writeContract({
-        address: contractAddress as Hex,
-        abi: SOCIAL_SCORE_ATTESTATOR_ABI,
-        functionName: 'submitScores',
-        args: [
-          {
-            user: signedPayload.payload.user,
-            ssaIndex: BigInt(signedPayload.payload.ssaIndex),
-            providers: signedPayload.payload.providers,
-            scores: signedPayload.payload.scores.map(s => BigInt(s)),
-            timestamp: BigInt(signedPayload.payload.timestamp),
-          },
-          signedPayload.signature,
-        ],
-        chainId: base.id,
+      const { payload, signature } = signedPayload;
+
+      // Convert payload to contract format (bigint types)
+      const contractPayload = {
+        user: payload.user,
+        ssaIndex: BigInt(payload.ssaIndex),
+        providers: payload.providers,
+        scores: payload.scores.map(s => BigInt(s)),
+        timestamp: BigInt(payload.timestamp),
+      };
+
+      // Simulate contract request
+      const { request } = await simulateContract(wagmiConfig, {
+        address: CONTRACTS.SocialScoreAttestator as `0x${string}`,
+        abi: SocialScoreAttestatorABI,
+        functionName: "submitScores",
+        args: [contractPayload, signature],
       });
+
+      // Submit tx
+      const hash = await writeContract(wagmiConfig, request);
+      setTxHash(hash);
+
+      // Wait for confirmation
+      setState('confirming');
+      await waitForTransactionReceipt(wagmiConfig, { hash });
+
+      setState('success');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Transaction failed');
+      let message = err instanceof Error ? err.message : "Unknown error submitting scores";
+      
+      // Parse SubmissionTooFrequent error to show user-friendly message
+      if (message.includes('SubmissionTooFrequent')) {
+        const match = message.match(/SubmissionTooFrequent\(uint256 nextAllowedTime\) \((\d+)\)/);
+        if (match && match[1]) {
+          const nextAllowedTime = parseInt(match[1]);
+          const now = Math.floor(Date.now() / 1000);
+          const hoursRemaining = Math.ceil((nextAllowedTime - now) / 3600);
+          const timeRemaining = hoursRemaining > 1 ? `${hoursRemaining} hours` : `${Math.ceil((nextAllowedTime - now) / 60)} minutes`;
+          
+          const nextAllowedDate = new Date(nextAllowedTime * 1000).toLocaleString();
+          message = `You can only submit scores once every 24 hours. Please wait ${timeRemaining}. Next submission available at: ${nextAllowedDate}`;
+        } else {
+          message = "You can only submit scores once every 24 hours. Please try again later.";
+        }
+      }
+      
+      setError(message);
       setState('error');
     }
-  }, [signedPayload, writeContract]);
+  }, [signedPayload]);
+
+  const checkSubmissionStatus = useCallback(async () => {
+    if (!address) return;
+
+    try {
+      const publicClient = getPublicClient(wagmiConfig);
+      const lastUpdated = await publicClient.readContract({
+        address: CONTRACTS.SocialScoreAttestator as `0x${string}`,
+        abi: SocialScoreAttestatorABI,
+        functionName: "lastUpdated",
+        args: [address],
+      });
+
+      if (lastUpdated && Number(lastUpdated) > 0) {
+        const lastTime = Number(lastUpdated);
+        const now = Math.floor(Date.now() / 1000);
+        const MIN_INTERVAL = 86400; // 24 hours
+        const nextTime = lastTime + MIN_INTERVAL;
+        
+        setLastSubmissionTime(lastTime);
+        setNextAllowedTime(nextTime);
+
+        if (now < nextTime) {
+          setState('cooldown');
+        } else if (state === 'cooldown') {
+          setState('idle');
+        }
+      }
+    } catch (err) {
+      console.error('Error checking submission status:', err);
+    }
+  }, [address, state]);
+
+  // Check submission status on mount and when address changes
+  useEffect(() => {
+    checkSubmissionStatus();
+  }, [checkSubmissionStatus]);
 
   const reset = useCallback(() => {
     setState('idle');
     setError(null);
+    setTxHash(null);
     setSignedPayload(null);
-  }, []);
+    checkSubmissionStatus();
+  }, [checkSubmissionStatus]);
 
-  return {
-    state,
-    error,
-    txHash: txHash || null,
-    signedPayload,
-    fetchSignature,
-    submitToChain,
+  return { 
+    state, 
+    error, 
+    txHash, 
+    lastSubmissionTime,
+    nextAllowedTime,
+    fetchSignature, 
+    submitToChain, 
     reset,
+    checkSubmissionStatus 
   };
 }

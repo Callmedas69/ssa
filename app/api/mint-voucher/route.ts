@@ -1,16 +1,12 @@
-// app/api/sign-scores/route.ts
+// app/api/mint-voucher/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
 import { isAddress, getAddress, createWalletClient, http, type Hex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base } from 'viem/chains';
-import { fetchAllProviderScores, providerRegistry } from '@/lib/providers';
-import { calculateSSAIndex } from '@/lib/ssaIndex';
-import { SSA_EIP712_DOMAIN } from '@/lib/contracts/config';
-import { SCORE_PAYLOAD_TYPES, type SignedScorePayload } from '@/lib/contracts/eip712';
 import { CONTRACTS } from '@/abi/addresses';
 
-// Rate limiting (shared with /api/scores)
+// Rate limiting
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT = 10;
 const RATE_WINDOW = 60 * 1000;
@@ -32,29 +28,59 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-interface SignScoreApiResponse {
+// Nonce tracking (in production, use a database)
+const usedNonces = new Map<string, Set<number>>();
+
+function getNextNonce(user: string): bigint {
+  const userNonces = usedNonces.get(user) || new Set();
+  let nonce = Date.now();
+  
+  while (userNonces.has(nonce)) {
+    nonce++;
+  }
+  
+  userNonces.add(nonce);
+  usedNonces.set(user, userNonces);
+  
+  return BigInt(nonce);
+}
+
+interface MintVoucherResponse {
   success: boolean;
+  voucher?: {
+    user: Hex;
+    expiresAt: bigint;
+    nonce: bigint;
+  };
   signature?: Hex;
   error?: string;
 }
 
-interface ScorePayloadRequest {
-  user: Hex;
-  ssaIndex: number;
-  providers: Hex[];
-  scores: number[];
-  timestamp: number;
-}
+// EIP-712 types for MintVoucher
+const MINT_VOUCHER_TYPES = {
+  MintVoucher: [
+    { name: 'user', type: 'address' },
+    { name: 'expiresAt', type: 'uint256' },
+    { name: 'nonce', type: 'uint256' },
+  ],
+} as const;
 
-export async function POST(request: NextRequest): Promise<NextResponse<SignScoreApiResponse>> {
+const MINT_VOUCHER_DOMAIN = {
+  name: 'ProfileSBT',
+  version: '1',
+  chainId: base.id,
+  verifyingContract: CONTRACTS.ProfileSBT as Hex,
+};
+
+export async function POST(request: NextRequest): Promise<NextResponse<MintVoucherResponse>> {
   try {
     // Check environment variables
-    const signerPrivateKey = process.env.BACKEND_SIGNER_PRIVATE_KEY;
+    const signerPrivateKey = process.env.VOUCHER_SIGNER_PRIVATE_KEY;
 
     if (!signerPrivateKey) {
-      console.error('BACKEND_SIGNER_PRIVATE_KEY not configured');
+      console.error('VOUCHER_SIGNER_PRIVATE_KEY not configured');
       return NextResponse.json(
-        { success: false, error: 'Backend signing not configured' },
+        { success: false, error: 'Voucher signing not configured' },
         { status: 500 }
       );
     }
@@ -68,38 +94,36 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
       );
     }
 
-    // Parse payload from request body
-    const payload: ScorePayloadRequest = await request.json();
+    // Parse request body
+    const body = await request.json();
+    const { user } = body;
 
-    if (!payload || !payload.user) {
+    if (!user) {
       return NextResponse.json(
-        { success: false, error: 'Invalid payload' },
+        { success: false, error: 'User address is required' },
         { status: 400 }
       );
     }
 
     // Validate address format
-    if (!isAddress(payload.user)) {
+    if (!isAddress(user)) {
       return NextResponse.json(
         { success: false, error: 'Invalid Ethereum address' },
         { status: 400 }
       );
     }
 
-    // Validate payload structure
-    if (!Array.isArray(payload.providers) || !Array.isArray(payload.scores)) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid providers or scores array' },
-        { status: 400 }
-      );
-    }
+    const checksumAddress = getAddress(user);
 
-    if (payload.providers.length !== payload.scores.length) {
-      return NextResponse.json(
-        { success: false, error: 'Providers and scores length mismatch' },
-        { status: 400 }
-      );
-    }
+    // Build voucher
+    const expiresAt = BigInt(Math.floor(Date.now() / 1000) + 3600); // 1 hour expiry
+    const nonce = getNextNonce(checksumAddress);
+
+    const voucher = {
+      user: checksumAddress as Hex,
+      expiresAt,
+      nonce,
+    };
 
     // Create signer from private key
     const account = privateKeyToAccount(signerPrivateKey as Hex);
@@ -113,33 +137,28 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
     });
 
     const signature = await walletClient.signTypedData({
-      domain: {
-        name: SSA_EIP712_DOMAIN.name,
-        version: SSA_EIP712_DOMAIN.version,
-        chainId: base.id,
-        verifyingContract: CONTRACTS.SocialScoreAttestator as Hex,
-      },
-      types: SCORE_PAYLOAD_TYPES,
-      primaryType: 'ScorePayload',
-      message: {
-        user: payload.user,
-        ssaIndex: BigInt(payload.ssaIndex),
-        providers: payload.providers,
-        scores: payload.scores.map(s => BigInt(s)),
-        timestamp: BigInt(payload.timestamp),
-      },
+      domain: MINT_VOUCHER_DOMAIN,
+      types: MINT_VOUCHER_TYPES,
+      primaryType: 'MintVoucher',
+      message: voucher,
     });
 
+    // Convert BigInt values to strings for JSON serialization
     const response = NextResponse.json({
       success: true,
+      voucher: {
+        user: voucher.user,
+        expiresAt: voucher.expiresAt.toString(),
+        nonce: voucher.nonce.toString(),
+      },
       signature,
     });
 
-    // No caching for signatures (timestamp-sensitive)
+    // No caching for vouchers (nonce and timestamp-sensitive)
     response.headers.set('Cache-Control', 'no-store');
     return response;
   } catch (error) {
-    console.error('Sign scores API error:', error);
+    console.error('Mint voucher API error:', error);
 
     // Provide more detailed error message
     const errorMessage = error instanceof Error

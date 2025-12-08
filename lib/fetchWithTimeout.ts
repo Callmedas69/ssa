@@ -13,8 +13,19 @@ export async function fetchWithTimeout(
       ...options,
       signal: controller.signal,
     });
-    return response;
-  } finally {
     clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+
+    // Provide better error messages for debugging
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error(`Request timeout after ${timeout}ms: ${url}`);
+      }
+      // Network errors (CORS, DNS, connection refused, etc.)
+      throw new Error(`Network error fetching ${url}: ${error.message}`);
+    }
+    throw error;
   }
 }

@@ -52,6 +52,14 @@ contract SocialScoreAttestator is
     bytes32 public constant SCORE_PAYLOAD_TYPEHASH =
         keccak256("ScorePayload(address user,uint256 ssaIndex,bytes32[] providers,uint256[] scores,uint256 timestamp)");
 
+    /// @notice Provider ID constants (official list)
+    bytes32 public constant PROVIDER_ETHOS = keccak256("ETHOS");
+    bytes32 public constant PROVIDER_NEYNAR = keccak256("NEYNAR");
+    bytes32 public constant PROVIDER_TALENT_BUILDER = keccak256("TALENT_BUILDER");
+    bytes32 public constant PROVIDER_TALENT_CREATOR = keccak256("TALENT_CREATOR");
+    bytes32 public constant PROVIDER_PASSPORT = keccak256("PASSPORT");
+    bytes32 public constant PROVIDER_QUOTIENT = keccak256("QUOTIENT");
+
     // ------------------------------------------------------------------------
     // Storage (follow storage layout carefully for upgrades)
     // ------------------------------------------------------------------------
@@ -80,6 +88,8 @@ contract SocialScoreAttestator is
 
     /// @notice Storage gap for future upgrades
     /// @dev Reserve 49 slots for future storage variables (reduced by 1 for usedSignatures)
+    /// UPGRADE TRACKING: Original gap was 50. Reduced to 49 when usedSignatures was added.
+    /// When adding new storage variables, reduce this gap accordingly to maintain storage layout.
     uint256[49] private __gap;
 
     // ------------------------------------------------------------------------
@@ -125,7 +135,6 @@ contract SocialScoreAttestator is
         if (_backendSigner == address(0)) revert ZeroAddress();
 
         __Ownable_init(msg.sender);
-        __UUPSUpgradeable_init();
         __Pausable_init();
         __EIP712_init("SocialScoreHub", "1");
 
@@ -244,7 +253,7 @@ contract SocialScoreAttestator is
 
         // Update SSA Index
         ssaIndexScores[payload.user] = payload.ssaIndex;
-        lastUpdated[payload.user] = payload.timestamp;
+        lastUpdated[payload.user] = block.timestamp; // Use block.timestamp for rate limiting
         emit SSAIndexUpdated(payload.user, payload.ssaIndex, payload.timestamp);
 
         // Update provider scores

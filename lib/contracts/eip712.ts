@@ -1,3 +1,5 @@
+// lib/contracts/eip712.ts
+
 import { type Hex } from 'viem';
 
 /**

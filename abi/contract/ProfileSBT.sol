@@ -7,6 +7,7 @@ pragma solidity ^0.8.24;
 ///  - One profile per wallet (by default)
 ///  - Minting is gated by an EIP-712 MintVoucher signed by a backend voucherSigner
 ///  - Optionally linked to SocialScoreAttestator to read on-chain SSA Index.
+///  - Delegates metadata rendering to ProfileSBTRenderer for upgradeable design.
 
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -14,6 +15,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {IProfileSBTRenderer} from "./IProfileSBTRenderer.sol";
 
 interface ISocialScoreAttestator {
     function ssaIndexScores(address user) external view returns (uint256);
@@ -32,7 +34,7 @@ contract ProfileSBT is
 
     struct MintVoucher {
         address user;       // wallet allowed to mint
-        uint256 expiresAt;  // unix timestamp (0 = no expiry)
+        uint256 expiresAt;  // unix timestamp (must be > 0)
         uint256 nonce;      // unique per voucher
     }
 
@@ -62,8 +64,15 @@ contract ProfileSBT is
     /// @notice mapping of wallet -> profile tokenId
     mapping(address => uint256) public profileTokenId;
 
-    /// @notice base URI for metadata
-    string private _baseTokenURI;
+    /// @notice Address of the metadata renderer contract
+    address public renderer;
+
+    /// @notice Collection external link for contractURI (e.g., "https://ssa.xyz")
+    string private _collectionExternalLink;
+
+    /// @notice Maximum voucher lifetime in seconds (default: 30 days)
+    /// @dev If 0, no maximum lifetime is enforced
+    uint256 public maxVoucherLifetime;
 
     // ------------------------------------------------------------------------
     // Events
@@ -71,8 +80,18 @@ contract ProfileSBT is
 
     event VoucherSignerUpdated(address indexed oldSigner, address indexed newSigner);
     event ScoreAttestatorUpdated(address indexed oldAddr, address indexed newAddr);
-    event BaseURIUpdated(string oldURI, string newURI);
+    event RendererUpdated(address indexed oldRenderer, address indexed newRenderer);
+    event CollectionExternalLinkUpdated(string oldUrl, string newUrl);
+    event MaxVoucherLifetimeUpdated(uint256 oldValue, uint256 newValue);
     event ProfileMinted(address indexed user, uint256 indexed tokenId, uint256 nonce);
+    event ProfileBurned(address indexed user, uint256 indexed tokenId);
+    event ProfileRevoked(address indexed user, uint256 indexed tokenId, address indexed revoker);
+
+    // EIP-5192: Soulbound Token Events
+    /// @notice Emitted when a token is locked (soulbound)
+    event Locked(uint256 indexed tokenId);
+    /// @notice Emitted when a token is unlocked
+    event Unlocked(uint256 indexed tokenId);
 
     // ------------------------------------------------------------------------
     // Errors
@@ -86,6 +105,8 @@ contract ProfileSBT is
     error AlreadyMinted();
     error ApprovalsDisabled();
     error NonTransferable();
+    error NoProfileToBurn();
+    error NoProfileToRevoke();
 
     // ------------------------------------------------------------------------
     // Init / Upgrade
@@ -101,24 +122,21 @@ contract ProfileSBT is
     /// @param _scoreAttestator SocialScoreAttestator address (optional, can be zero)
     /// @param _name ERC721 name
     /// @param _symbol ERC721 symbol
-    /// @param baseURI base token URI
     function initialize(
         address _voucherSigner,
         address _scoreAttestator,
         string memory _name,
-        string memory _symbol,
-        string memory baseURI
+        string memory _symbol
     ) public initializer {
         if (_voucherSigner == address(0)) revert ZeroAddress();
 
         __Ownable_init(msg.sender);
-        __UUPSUpgradeable_init();
         __ERC721_init(_name, _symbol);
         __EIP712_init("ProfileSBT", "1");
 
         voucherSigner = _voucherSigner;
         scoreAttestator = _scoreAttestator;
-        _baseTokenURI = baseURI;
+        maxVoucherLifetime = 30 days; // Default: 30 days maximum voucher validity
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
@@ -138,9 +156,35 @@ contract ProfileSBT is
         scoreAttestator = _scoreAttestator;
     }
 
-    function setBaseURI(string calldata newBaseURI) external onlyOwner {
-        emit BaseURIUpdated(_baseTokenURI, newBaseURI);
-        _baseTokenURI = newBaseURI;
+    /// @notice Set the metadata renderer contract
+    function setRenderer(address _renderer) external onlyOwner {
+        if (_renderer == address(0)) revert ZeroAddress();
+        emit RendererUpdated(renderer, _renderer);
+        renderer = _renderer;
+    }
+
+    /// @notice Set the collection external link for contractURI
+    function setCollectionExternalLink(string calldata url) external onlyOwner {
+        emit CollectionExternalLinkUpdated(_collectionExternalLink, url);
+        _collectionExternalLink = url;
+    }
+
+    /// @notice Set maximum voucher lifetime (0 = no limit)
+    function setMaxVoucherLifetime(uint256 lifetime) external onlyOwner {
+        emit MaxVoucherLifetimeUpdated(maxVoucherLifetime, lifetime);
+        maxVoucherLifetime = lifetime;
+    }
+
+    /// @notice Admin revoke a user's profile. Allows user to re-mint with new voucher.
+    function revoke(address user) external onlyOwner {
+        uint256 tokenId = profileTokenId[user];
+        if (tokenId == 0) revert NoProfileToRevoke();
+
+        delete profileTokenId[user];
+        hasMinted[user] = false;
+
+        _burn(tokenId);
+        emit ProfileRevoked(user, tokenId, msg.sender);
     }
 
     // ------------------------------------------------------------------------
@@ -159,7 +203,12 @@ contract ProfileSBT is
     {
         if (voucher.user != msg.sender) revert CallerNotUser();
 
-        if (voucher.expiresAt != 0 && block.timestamp > voucher.expiresAt) {
+        // Enforce voucher expiry
+        if (voucher.expiresAt == 0) revert VoucherExpired(); // Must have expiry
+        if (block.timestamp > voucher.expiresAt) revert VoucherExpired();
+        
+        // Enforce maximum voucher lifetime if configured
+        if (maxVoucherLifetime != 0 && voucher.expiresAt > block.timestamp + maxVoucherLifetime) {
             revert VoucherExpired();
         }
 
@@ -188,6 +237,19 @@ contract ProfileSBT is
         profileTokenId[msg.sender] = tokenId;
 
         emit ProfileMinted(msg.sender, tokenId, voucher.nonce);
+        emit Locked(tokenId); // EIP-5192: Token is permanently locked
+    }
+
+    /// @notice Burn your own profile. Allows re-minting with new voucher.
+    function burn() external {
+        uint256 tokenId = profileTokenId[msg.sender];
+        if (tokenId == 0) revert NoProfileToBurn();
+
+        delete profileTokenId[msg.sender];
+        hasMinted[msg.sender] = false;
+
+        _burn(tokenId);
+        emit ProfileBurned(msg.sender, tokenId);
     }
 
     // ------------------------------------------------------------------------
@@ -218,12 +280,35 @@ contract ProfileSBT is
     }
 
     // ------------------------------------------------------------------------
-    // Views / Helpers
+    // EIP-5192: Soulbound Token Interface
     // ------------------------------------------------------------------------
 
-    function _baseURI() internal view override returns (string memory) {
-        return _baseTokenURI;
+    /// @notice Returns the locking status of a Soulbound Token
+    /// @dev All tokens are permanently locked (soulbound)
+    /// @param tokenId The identifier for a token
+    /// @return true if the token is locked (always true for this implementation)
+    function locked(uint256 tokenId) external view returns (bool) {
+        address owner = _ownerOf(tokenId);
+        require(owner != address(0), "Token does not exist");
+        return true; // All tokens are permanently soulbound
     }
+
+    /// @notice ERC-165 interface detection
+    /// @dev Supports ERC-721, ERC-165, and EIP-5192 interfaces
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override
+        returns (bool)
+    {
+        return
+            interfaceId == 0xb45a3c0e || // EIP-5192
+            super.supportsInterface(interfaceId);
+    }
+
+    // ------------------------------------------------------------------------
+    // Views / Helpers
+    // ------------------------------------------------------------------------
 
     /// @notice Convenience view to get a user's SSA Index from the attestator.
     function getUserSSAIndex(address user) external view returns (uint256) {
@@ -239,5 +324,27 @@ contract ProfileSBT is
     /// @notice Get total minted profiles count.
     function totalSupply() external view returns (uint256) {
         return _tokenIdCounter;
+    }
+
+    // ------------------------------------------------------------------------
+    // Metadata (Delegated to Renderer)
+    // ------------------------------------------------------------------------
+
+    /// @notice Returns fully on-chain metadata with dynamic SVG
+    /// @dev Delegates to ProfileSBTRenderer for rendering
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        address owner = _ownerOf(tokenId);
+        require(owner != address(0), "Token does not exist");
+        require(renderer != address(0), "Renderer not set");
+
+        return IProfileSBTRenderer(renderer).generateTokenURI(tokenId, owner, scoreAttestator);
+    }
+
+    /// @notice Returns collection-level metadata for marketplaces
+    /// @dev Delegates to ProfileSBTRenderer for rendering
+    function contractURI() external view returns (string memory) {
+        require(renderer != address(0), "Renderer not set");
+
+        return IProfileSBTRenderer(renderer).generateContractURI(name(), _collectionExternalLink);
     }
 }

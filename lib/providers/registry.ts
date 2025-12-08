@@ -1,4 +1,5 @@
 import { keccak256, toBytes, type Hex } from 'viem';
+import { PROVIDER_ID_MAP } from '@/lib/contracts/providerIds';
 
 /**
  * Normalization strategy for converting raw scores to 0-100
@@ -64,9 +65,18 @@ class ProviderRegistry {
 
   /**
    * Register a new provider
+   * 
+   * Provider ID calculation MUST match the contract constants exactly.
+   * Uses PROVIDER_ID_MAP which contains the correct keccak256 hashes.
    */
   register(config: ProviderConfig, fetcher: ProviderFetcher): void {
-    const onChainId = keccak256(toBytes(config.id.toUpperCase().replace(/([a-z])([A-Z])/g, '$1_$2')));
+    // Get the on-chain provider ID from the centralized map
+    const onChainId = PROVIDER_ID_MAP[config.id];
+    
+    if (!onChainId) {
+      throw new Error(`No on-chain provider ID found for ${config.id}. Update PROVIDER_ID_MAP.`);
+    }
+    
     this.providers.set(config.id, { ...config, fetcher, onChainId });
   }
 
@@ -167,4 +177,46 @@ export function normalizeScore(rawScore: number, config: ProviderConfig): number
       // Already 0-100
       return Math.min(rawScore, 100);
   }
+}
+
+/**
+ * Verify provider ID calculation matches deployed contract
+ * This is a development/debugging utility
+ * 
+ * Note: The deployed contract uses provider IDs without underscores
+ * (e.g., "TALENTBUILDER" not "TALENT_BUILDER"), even though the contract
+ * constants define them with underscores.
+ */
+export function verifyProviderIdCalculation(providerId: string): {
+  normalized: string;
+  onChainId: Hex;
+  expectedProviders: string[];
+} {
+  const normalized = providerId.toUpperCase();
+  const onChainId = keccak256(toBytes(normalized));
+  
+  // Known provider config IDs
+  const knownProviders = [
+    'ethos',
+    'neynar',
+    'talentBuilder',
+    'talentCreator',
+    'passport',
+    'quotient',
+  ];
+
+  return {
+    normalized,
+    onChainId,
+    expectedProviders: knownProviders,
+  };
+}
+
+/**
+ * Get the expected on-chain provider ID for a provider config ID
+ * This matches what the deployed contract expects
+ */
+export function getExpectedProviderId(providerConfigId: string): Hex {
+  const normalized = providerConfigId.toUpperCase();
+  return keccak256(toBytes(normalized));
 }

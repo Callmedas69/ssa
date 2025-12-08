@@ -130,9 +130,15 @@ export async function GET(request: NextRequest): Promise<NextResponse<ScoreApiRe
     response.headers.set('Cache-Control', 'private, max-age=300');
     return response;
   } catch (error) {
-    console.error('API error:', error);
+    console.error('API error fetching scores:', error);
+
+    // Provide more detailed error message
+    const errorMessage = error instanceof Error
+      ? error.message
+      : 'Internal server error';
+
     return NextResponse.json(
-      { success: false, data: null, error: 'Internal server error' },
+      { success: false, data: null, error: errorMessage },
       { status: 500 }
     );
   }

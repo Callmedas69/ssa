@@ -15,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Social Score Attestator",
-  description: "Your unified SSA Index from 6 reputation providers - Neynar, Ethos, Talent, Quotient, and Passport",
+  description:
+    "Your unified SSA Index from 6 reputation providers - Neynar, Ethos, Talent, Quotient, and Passport",
 };
 
 export default function RootLayout({

@@ -1,5 +1,16 @@
+import type { Hex } from "viem";
+
 // Score provider types
 export type ScoreProvider = 'neynar' | 'ethos' | 'talentBuilder' | 'talentCreator' | 'quotient' | 'passport';
+
+// Payload that user submits to the backend for EIP-712 signing
+export interface ScorePayload {
+  user: `0x${string}`;
+  ssaIndex: number;              // 0–100 Social Score Attestator index
+  providers: Hex[];              // array of provider IDs (keccak256 strings)
+  scores: number[];              // corresponding scores (0–100)
+  timestamp: number;             // unix timestamp signed by backend
+}
 
 // Neynar Score (Farcaster social graph)
 export interface NeynarScore {

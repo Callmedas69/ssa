@@ -1,18 +1,20 @@
 import { base } from 'viem/chains';
+import { CONTRACTS } from '@/abi/addresses';
 
 /**
- * Contract deployment addresses
- * Update these after deploying to mainnet/testnet
+ * Contract deployment addresses on Base Mainnet (source of truth: abi/addresses.ts)
  */
 export const CONTRACT_ADDRESSES = {
   [base.id]: {
-    socialScoreAttestator: '' as `0x${string}`, // TODO: Update after deployment
-    profileSBT: '' as `0x${string}`, // TODO: Update after deployment
+    socialScoreAttestator: CONTRACTS.SocialScoreAttestator as `0x${string}`,
+    profileSBT: CONTRACTS.ProfileSBT as `0x${string}`,
   },
 } as const;
 
 /**
  * EIP-712 Domain for SocialScoreAttestator
+ * IMPORTANT: Must match the domain name in the deployed contract
+ * Source: SocialScoreAttestator.sol line 139: __EIP712_init("SocialScoreHub", "1")
  */
 export const SSA_EIP712_DOMAIN = {
   name: 'SocialScoreHub',
@@ -26,14 +28,3 @@ export const PROFILE_SBT_EIP712_DOMAIN = {
   name: 'ProfileSBT',
   version: '1',
 } as const;
-
-/**
- * Get contract addresses for a given chain ID
- */
-export function getContractAddresses(chainId: number) {
-  const addresses = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES];
-  if (!addresses) {
-    throw new Error(`No contract addresses configured for chain ${chainId}`);
-  }
-  return addresses;
-}
