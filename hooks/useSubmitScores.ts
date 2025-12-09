@@ -8,10 +8,7 @@ import { useAccount } from "wagmi";
 import { CONTRACTS } from "@/abi/addresses";
 import { SocialScoreAttestatorABI } from "@/abi/SocialScoreAttestator";
 
-import {
-  validateProvidersOnChain,
-  isContractPaused,
-} from "@/lib/contracts/providerValidation";
+import { isContractPaused } from "@/lib/contracts/providerValidation";
 import { PROVIDER_ID_MAP } from "@/lib/contracts/providerIds";
 import { getPublicClient } from "wagmi/actions";
 
@@ -90,32 +87,34 @@ export function useSubmitScores() {
         timestamp: Math.floor(Date.now() / 1000),
       };
 
-      // 5. Validate providers
-      const providerValidation = await validateProvidersOnChain(payload.providers);
-      if (!providerValidation.valid) {
-        throw new Error(
-          `Invalid providers: ${providerValidation.invalidProviders.join(", ")}`
-        );
-      }
-
-      // 5. Request backend for EIP-712 signature
+      // Request backend for EIP-712 signature
       const sigRes = await fetch("/api/sign-scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (!sigRes.ok) throw new Error("Backend signature failed");
+      if (!sigRes.ok) {
+        const errorData = await sigRes.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || "Backend signature failed");
+      }
 
-      const { signature } = await sigRes.json();
+      const sigData = await sigRes.json();
+      if (!sigData.success || !sigData.signature) {
+        throw new Error(sigData.error || "Invalid signature response");
+      }
+
+      const { signature } = sigData;
 
       setSignedPayload({ payload, signature });
       setState('ready');
+      return true;
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Unknown error preparing signature";
       setError(message);
       setState('error');
+      return false;
     }
   }, [address]);
 
@@ -148,7 +147,7 @@ export function useSubmitScores() {
         functionName: "submitScores",
         args: [contractPayload, signature],
       });
-
+      
       // Submit tx
       const hash = await writeContract(wagmiConfig, request);
       setTxHash(hash);
@@ -218,6 +217,13 @@ export function useSubmitScores() {
   useEffect(() => {
     checkSubmissionStatus();
   }, [checkSubmissionStatus]);
+
+  // Auto-submit when signature is ready
+  useEffect(() => {
+    if (state === 'ready' && signedPayload) {
+      submitToChain();
+    }
+  }, [state, signedPayload, submitToChain]);
 
   const reset = useCallback(() => {
     setState('idle');

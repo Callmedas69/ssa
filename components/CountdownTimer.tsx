@@ -20,7 +20,7 @@ export function CountdownTimer({
       const diff = targetTime - now;
 
       if (diff <= 0) {
-        setTimeRemaining("Ready to submit!");
+        setTimeRemaining("");
         if (onComplete) {
           onComplete();
         }
@@ -46,13 +46,12 @@ export function CountdownTimer({
     return () => clearInterval(interval);
   }, [targetTime, onComplete]);
 
+  if (!timeRemaining) return null;
+
   return (
-    <div className="flex items-center justify-center gap-2">
+    <span className="inline-flex items-center gap-2">
       <Clock className="h-4 w-4" />
-      <span className="text-sm">
-        Next submission in:{" "}
-        <span className="font-mono font-semibold">{timeRemaining}</span>
-      </span>
-    </div>
+      <span className="font-mono font-semibold">{timeRemaining}</span>
+    </span>
   );
 }

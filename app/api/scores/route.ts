@@ -5,13 +5,29 @@ import { calculateSSAIndex } from '@/lib/ssaIndex';
 import { resolveIdentity } from '@/lib/identity';
 import type { ScoreApiResponse, SocialScores } from '@/lib/types';
 
-// Simple in-memory rate limiting (per deployment instance)
+// Rate limiting with automatic cleanup (per deployment instance)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT = 10; // requests per minute
 const RATE_WINDOW = 60 * 1000; // 1 minute
+const MAX_ENTRIES = 1000; // Prevent memory leaks
+
+function cleanupOldEntries() {
+  const now = Date.now();
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now > value.resetTime) {
+      rateLimitMap.delete(key);
+    }
+  }
+}
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
+  
+  // Periodic cleanup to prevent memory leaks
+  if (rateLimitMap.size > MAX_ENTRIES) {
+    cleanupOldEntries();
+  }
+
   const record = rateLimitMap.get(ip);
 
   if (!record || now > record.resetTime) {

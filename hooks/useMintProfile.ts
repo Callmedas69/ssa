@@ -92,10 +92,12 @@ export function useMintProfile() {
 
       setVoucher(voucherData);
       setState('ready');
+      return true;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error fetching voucher";
       setError(message);
       setState('error');
+      return false;
     }
   }, [address]);
 

@@ -3,47 +3,36 @@
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useSubmitScores } from "@/hooks/useSubmitScores";
-import { CountdownTimer } from "@/components/CountdownTimer";
 import { Loader2, Check, AlertCircle, ExternalLink } from "lucide-react";
 
 interface SubmitScoresButtonProps {
   disabled?: boolean;
+  hasMinted?: boolean;
 }
 
-export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
+export function SubmitScoresButton({
+  disabled,
+  hasMinted,
+}: SubmitScoresButtonProps) {
   const { isConnected } = useAccount();
-  const {
-    state,
-    error,
-    txHash,
-    nextAllowedTime,
-    fetchSignature,
-    submitToChain,
-    reset,
-    checkSubmissionStatus,
-  } = useSubmitScores();
-
-  // Contract is deployed - no configuration check needed
+  const { state, error, txHash, fetchSignature, submitToChain, reset } =
+    useSubmitScores();
 
   const handleClick = async () => {
     if (state === "idle" || state === "error") {
+      // Single-click flow: fetch signature (auto-submits via useEffect)
       await fetchSignature();
-    } else if (state === "ready") {
-      await submitToChain();
+      // submitToChain is automatically called by useEffect when state becomes 'ready'
     } else if (state === "success" || state === "cooldown") {
       reset();
     }
-  };
-
-  const handleCountdownComplete = () => {
-    checkSubmissionStatus();
   };
 
   // Button content based on state
   const getButtonContent = () => {
     switch (state) {
       case "idle":
-        return "Attest On-Chain";
+        return hasMinted ? "Update" : "Attest";
       case "signing":
         return (
           <>
@@ -52,7 +41,6 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
           </>
         );
       case "ready":
-        return "Confirm Transaction";
       case "submitting":
         return (
           <>
@@ -82,14 +70,7 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
           </>
         );
       case "cooldown":
-        return nextAllowedTime ? (
-          <CountdownTimer
-            targetTime={nextAllowedTime}
-            onComplete={handleCountdownComplete}
-          />
-        ) : (
-          "Cooldown"
-        );
+        return "Cooldown";
       default:
         return "Attest On-Chain";
     }
@@ -114,7 +95,7 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
             ? "secondary"
             : "default"
         }
-        className="w-full"
+        className="w-full flex items-center justify-center"
       >
         {getButtonContent()}
       </Button>
@@ -123,12 +104,13 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
       {error && (
         <div className="space-y-1">
           <p className="text-sm text-destructive text-center font-medium">
-            {error}
+            {error.includes("No signed payload")
+              ? "Failed to prepare attestation. Please try again."
+              : error}
           </p>
-          {error.includes("provider") && (
+          {error.toLowerCase().includes("provider") && (
             <p className="text-xs text-muted-foreground text-center">
-              This may indicate a configuration issue. Please contact support if
-              the problem persists.
+              Please try again. If the issue persists, contact support.
             </p>
           )}
           {error.includes("paused") && (

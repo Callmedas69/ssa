@@ -3,6 +3,8 @@
 import { ProfileSBTDisplay } from "./ProfileSBTDisplay";
 import { SubmitScoresButton } from "./SubmitScoresButton";
 import { MintProfileButton } from "./MintProfileButton";
+import { CountdownTimer } from "./CountdownTimer";
+import { useSubmitScores } from "@/hooks/useSubmitScores";
 import type { UserIdentity } from "@/lib/types";
 import { useTheme } from "./ThemeProvider";
 
@@ -22,6 +24,7 @@ export function OnchainProfileCard({
   hasMintedSBT,
 }: OnchainProfileCardProps) {
   const { theme } = useTheme();
+  const { nextAllowedTime } = useSubmitScores();
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
 
   return (
@@ -42,7 +45,7 @@ export function OnchainProfileCard({
       >
         <div className="grid grid-cols-[auto_1fr] gap-6">
           {/* Profile SBT Display */}
-          <ProfileSBTDisplay address={address} hasMinted={hasMintedSBT} />
+          <ProfileSBTDisplay hasMinted={hasMintedSBT} />
 
           {/* Profile Details */}
           <div className="space-y-4">
@@ -89,11 +92,31 @@ export function OnchainProfileCard({
                   )}
                 </div>
               </div>
+
+              {nextAllowedTime && (
+                <div className="flex items-baseline justify-between gap-8 pt-2">
+                  <span className="text-[11px] font-bold text-black uppercase">
+                    Next Attestation
+                  </span>
+                  <span className="text-[11px] font-semibold text-black font-mono">
+                    <CountdownTimer targetTime={nextAllowedTime} />
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 pt-2">
-              <SubmitScoresButton disabled={ssaIndex === null} />
-              <MintProfileButton />
+              <div className="flex-1 min-w-[140px]">
+                <SubmitScoresButton
+                  disabled={ssaIndex === null}
+                  hasMinted={hasMintedSBT}
+                />
+              </div>
+              <div className="flex-1 min-w-[140px]">
+                <MintProfileButton
+                  hasAttested={ssaIndex !== null && ssaIndex > 0}
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -106,6 +106,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
 
     // Sign EIP-712 typed data
     const rpcUrl = process.env.BASE_RPC_URL || process.env.NEXT_PUBLIC_BASE_RPC_URL || process.env.NEXT_PUBLIC_RPC_URL || 'https://mainnet.base.org';
+    
     const walletClient = createWalletClient({
       account,
       chain: base,
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
         timestamp: BigInt(payload.timestamp),
       },
     });
-
+    
     const response = NextResponse.json({
       success: true,
       signature,

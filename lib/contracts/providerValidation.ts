@@ -4,11 +4,29 @@ import { wagmiConfig } from "@/lib/wagmi/config";
 import { CONTRACTS } from "@/abi/addresses";
 import { SocialScoreAttestatorABI } from "@/abi/SocialScoreAttestator";
 
-const CACHE_TTL = 30_000; // 30 seconds
-const providerCache = new Map<string, { allowed: boolean; ts: number }>();
+/**
+ * Retry helper with exponential backoff
+ */
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 500
+): Promise<T> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      const delay = baseDelay * Math.pow(2, i);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Max retries reached');
+}
 
 /**
  * Validate that all providerIds exist on-chain
+ * Includes retry logic for transient RPC failures and rate limiting
  */
 export async function validateProvidersOnChain(providers: Hex[]) {
   const client = getPublicClient(wagmiConfig);
@@ -16,33 +34,34 @@ export async function validateProvidersOnChain(providers: Hex[]) {
   const details: { providerId: Hex; allowed: boolean }[] = [];
   const invalid: Hex[] = [];
 
-  for (const pid of providers) {
-    const key = pid.toLowerCase();
-    const cached = providerCache.get(key);
-
-    if (cached && Date.now() - cached.ts < CACHE_TTL) {
-      details.push({ providerId: pid, allowed: cached.allowed });
-      if (!cached.allowed) invalid.push(pid);
-      continue;
-    }
-
+  for (let i = 0; i < providers.length; i++) {
+    const pid = providers[i];
     let allowed = false;
 
     try {
-      allowed = await client.readContract({
-        address: CONTRACTS.SocialScoreAttestator as `0x${string}`,
-        abi: SocialScoreAttestatorABI,
-        functionName: "isProviderAllowed",
-        args: [pid],
-      });
-    } catch {
+      allowed = await retryWithBackoff(
+        () => client.readContract({
+          address: CONTRACTS.SocialScoreAttestator as `0x${string}`,
+          abi: SocialScoreAttestatorABI,
+          functionName: "isProviderAllowed",
+          args: [pid],
+        }),
+        3, // 3 retries
+        500 // 500ms base delay (500ms, 1s, 2s)
+      );
+    } catch (error) {
+      console.error(`Provider validation failed after retries for ${pid}:`, error);
       allowed = false;
     }
 
-    providerCache.set(key, { allowed, ts: Date.now() });
-
     details.push({ providerId: pid, allowed });
     if (!allowed) invalid.push(pid);
+
+    // Add small delay between checks to avoid rate limiting
+    // Skip delay after last provider
+    if (i < providers.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
   }
 
   return {

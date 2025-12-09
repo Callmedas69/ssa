@@ -9,11 +9,13 @@ import { Loader2, Check, AlertCircle, ExternalLink, Award } from "lucide-react";
 interface MintProfileButtonProps {
   disabled?: boolean;
   onMintSuccess?: () => void;
+  hasAttested?: boolean;
 }
 
 export function MintProfileButton({
   disabled,
   onMintSuccess,
+  hasAttested = false,
 }: MintProfileButtonProps) {
   const { isConnected, address } = useAccount();
   const {
@@ -48,9 +50,11 @@ export function MintProfileButton({
     }
 
     if (state === "idle" || state === "error") {
-      await fetchVoucher();
-    } else if (state === "ready") {
-      await mint();
+      // Single-click flow: fetch voucher then mint immediately
+      const success = await fetchVoucher();
+      if (success) {
+        await mint();
+      }
     } else if (state === "success") {
       reset();
       checkMintStatus();
@@ -73,7 +77,7 @@ export function MintProfileButton({
         return (
           <span className="inline-flex items-center gap-2">
             <Award className="h-4 w-4" />
-            Mint Profile
+            Mint
           </span>
         );
       case "checking":
@@ -87,11 +91,10 @@ export function MintProfileButton({
         return (
           <span className="inline-flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Preparing Voucher...
+            Preparing...
           </span>
         );
       case "ready":
-        return "Confirm Mint";
       case "minting":
         return (
           <span className="inline-flex items-center gap-2">
@@ -130,7 +133,8 @@ export function MintProfileButton({
     state === "fetching" ||
     state === "minting" ||
     state === "confirming";
-  const isDisabled = !isConnected || isLoading || disabled || hasMinted;
+  const isDisabled =
+    !isConnected || isLoading || disabled || hasMinted || !hasAttested;
 
   return (
     <div className="space-y-2">
@@ -184,6 +188,12 @@ export function MintProfileButton({
       {hasMinted && state === "idle" && (
         <p className="text-xs text-center text-muted-foreground">
           Your Profile NFT is already minted
+        </p>
+      )}
+
+      {!hasAttested && !hasMinted && (
+        <p className="text-xs text-center text-muted-foreground">
+          Please attest your scores first
         </p>
       )}
     </div>
