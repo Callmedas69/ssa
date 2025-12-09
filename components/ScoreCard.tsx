@@ -169,48 +169,46 @@ export const ScoreCard = memo(function ScoreCard({
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
-      <div className="flex items-center justify-between mb-1">
-        <h3 className="font-semibold text-card-foreground uppercase">
-          {info.name}
-        </h3>
-        <span className="text-xs text-muted-foreground">
-          Max: {info.maxScore}
-        </span>
+    <div className="mac1-window bg-white p-1">
+      <div className="mac1-title-bar mb-2">
+        <h3 className="uppercase text-[11px]">{info.name}</h3>
       </div>
-      <p className="text-xs text-muted-foreground mb-4 italic">
-        {info.description}
-      </p>
-
-      {data ? (
-        <>
-          <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-3xl font-bold text-card-foreground">
-              {scoreDisplay}
-            </span>
-            {extraInfo && (
-              <span className="text-sm text-muted-foreground">{extraInfo}</span>
-            )}
-          </div>
-          <div
-            role="progressbar"
-            aria-valuenow={Math.round(percentage)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label={`${info.name} score: ${scoreDisplay}`}
-            className="h-2 w-full bg-muted rounded-full overflow-hidden"
-          >
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-500"
-              style={{ width: `${percentage}%` }}
-            />
-          </div>
-        </>
-      ) : (
-        <div className="text-center py-4">
-          <span className="text-muted-foreground">No profile found</span>
+      <div className="mac1-inset bg-white p-3">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] font-bold">Max: {info.maxScore}</span>
         </div>
-      )}
+        <p className="text-[11px] mb-4 italic text-black">{info.description}</p>
+
+        {data ? (
+          <>
+            <div className="flex items-baseline gap-2 mb-3">
+              <span className="text-3xl font-bold text-black">
+                {scoreDisplay}
+              </span>
+              {extraInfo && (
+                <span className="text-[11px] text-black">{extraInfo}</span>
+              )}
+            </div>
+            <div
+              role="progressbar"
+              aria-valuenow={Math.round(percentage)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${info.name} score: ${scoreDisplay}`}
+              className="h-4 w-full mac1-inset bg-white"
+            >
+              <div
+                className="h-full bg-[#000000] transition-all duration-500"
+                style={{ width: `${percentage}%` }}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <span className="text-black text-[11px]">No profile found</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 });

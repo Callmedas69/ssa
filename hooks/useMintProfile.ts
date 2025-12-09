@@ -143,11 +143,11 @@ export function useMintProfile() {
   }, [voucher]);
 
   const reset = useCallback(() => {
-    setState('idle');
+    setState(hasMinted ? 'success' : 'idle');
     setError(null);
     setTxHash(null);
     setVoucher(null);
-  }, []);
+  }, [hasMinted]);
 
   return { 
     state, 

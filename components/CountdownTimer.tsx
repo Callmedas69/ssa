@@ -47,13 +47,11 @@ export function CountdownTimer({
   }, [targetTime, onComplete]);
 
   return (
-    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+    <div className="flex items-center justify-center gap-2">
       <Clock className="h-4 w-4" />
-      <span>
+      <span className="text-sm">
         Next submission in:{" "}
-        <span className="font-mono font-medium text-foreground">
-          {timeRemaining}
-        </span>
+        <span className="font-mono font-semibold">{timeRemaining}</span>
       </span>
     </div>
   );

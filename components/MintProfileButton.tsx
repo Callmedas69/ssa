@@ -42,6 +42,11 @@ export function MintProfileButton({
   }, [state, hasMinted, onMintSuccess]);
 
   const handleClick = async () => {
+    // Don't allow any action if already minted
+    if (hasMinted) {
+      return;
+    }
+
     if (state === "idle" || state === "error") {
       await fetchVoucher();
     } else if (state === "ready") {
@@ -54,66 +59,66 @@ export function MintProfileButton({
 
   // Button content based on state
   const getButtonContent = () => {
-    if (hasMinted && state === "idle") {
+    if (hasMinted) {
       return (
-        <>
-          <Check className="mr-2 h-4 w-4" />
-          Profile Minted
-        </>
+        <span className="inline-flex items-center gap-2">
+          <Check className="h-4 w-4" />
+          Minted
+        </span>
       );
     }
 
     switch (state) {
       case "idle":
         return (
-          <>
-            <Award className="mr-2 h-4 w-4" />
-            Mint Profile NFT
-          </>
+          <span className="inline-flex items-center gap-2">
+            <Award className="h-4 w-4" />
+            Mint Profile
+          </span>
         );
       case "checking":
         return (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <span className="inline-flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
             Checking...
-          </>
+          </span>
         );
       case "fetching":
         return (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <span className="inline-flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
             Preparing Voucher...
-          </>
+          </span>
         );
       case "ready":
         return "Confirm Mint";
       case "minting":
         return (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <span className="inline-flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
             Minting...
-          </>
+          </span>
         );
       case "confirming":
         return (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <span className="inline-flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
             Confirming...
-          </>
+          </span>
         );
       case "success":
         return (
-          <>
-            <Check className="mr-2 h-4 w-4" />
+          <span className="inline-flex items-center gap-2">
+            <Check className="h-4 w-4" />
             Minted!
-          </>
+          </span>
         );
       case "error":
         return (
-          <>
-            <AlertCircle className="mr-2 h-4 w-4" />
+          <span className="inline-flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
             Try Again
-          </>
+          </span>
         );
       default:
         return "Mint Profile NFT";
@@ -125,8 +130,7 @@ export function MintProfileButton({
     state === "fetching" ||
     state === "minting" ||
     state === "confirming";
-  const isDisabled =
-    !isConnected || isLoading || disabled || (hasMinted && state === "idle");
+  const isDisabled = !isConnected || isLoading || disabled || hasMinted;
 
   return (
     <div className="space-y-2">
@@ -134,13 +138,13 @@ export function MintProfileButton({
         onClick={handleClick}
         disabled={isDisabled}
         variant={
-          state === "success"
+          state === "success" || (hasMinted && state === "idle")
             ? "secondary"
             : state === "error"
             ? "destructive"
             : "default"
         }
-        className="w-full"
+        className="w-full flex justify-center flex-row items-center"
       >
         {getButtonContent()}
       </Button>

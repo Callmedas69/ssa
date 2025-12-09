@@ -3,7 +3,6 @@
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useSubmitScores } from "@/hooks/useSubmitScores";
-import { MintProfileButton } from "@/components/MintProfileButton";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { Loader2, Check, AlertCircle, ExternalLink } from "lucide-react";
 
@@ -82,6 +81,15 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
             Try Again
           </>
         );
+      case "cooldown":
+        return nextAllowedTime ? (
+          <CountdownTimer
+            targetTime={nextAllowedTime}
+            onComplete={handleCountdownComplete}
+          />
+        ) : (
+          "Cooldown"
+        );
       default:
         return "Attest On-Chain";
     }
@@ -94,16 +102,6 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
 
   return (
     <div className="space-y-2">
-      {/* Show countdown timer when in cooldown */}
-      {state === "cooldown" && nextAllowedTime && (
-        <div className="p-3 bg-muted rounded-lg border border-border">
-          <CountdownTimer
-            targetTime={nextAllowedTime}
-            onComplete={handleCountdownComplete}
-          />
-        </div>
-      )}
-
       <Button
         onClick={handleClick}
         disabled={isDisabled}
@@ -112,6 +110,8 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
             ? "secondary"
             : state === "error"
             ? "destructive"
+            : state === "cooldown"
+            ? "secondary"
             : "default"
         }
         className="w-full"
@@ -156,18 +156,6 @@ export function SubmitScoresButton({ disabled }: SubmitScoresButtonProps) {
           View on BaseScan
           <ExternalLink className="h-3 w-3" />
         </a>
-      )}
-
-      {/* Mint Profile Button - shown after successful attestation OR during cooldown */}
-      {(state === "success" || state === "cooldown") && (
-        <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-sm text-center text-muted-foreground mb-3">
-            {state === "success"
-              ? "🎉 Scores attested! Now mint your Profile NFT:"
-              : "Mint your Profile NFT:"}
-          </p>
-          <MintProfileButton />
-        </div>
       )}
     </div>
   );

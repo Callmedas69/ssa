@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
-import { SSAIndexCard } from "./SSAIndexCard";
+import { OnchainProfileCard } from "./OnchainProfileCard";
 import { ScoreCard } from "./ScoreCard";
-import { SubmitScoresButton } from "./SubmitScoresButton";
 import { AllProviderGuidance } from "./ProviderGuidance";
-import { UserIdentity } from "./UserIdentity";
+import { useHasMintedSBT } from "@/hooks/useHasMintedSBT";
 import type { SocialScores, ScoreApiResponse } from "@/lib/types";
 
 async function fetchScores(address: string): Promise<SocialScores> {
@@ -39,6 +38,7 @@ async function fetchScores(address: string): Promise<SocialScores> {
 export function ScoresDashboard() {
   const { address, isConnected } = useAccount();
   const [showGuidance, setShowGuidance] = useState(false);
+  const { hasMinted } = useHasMintedSBT(address);
 
   const {
     data: scores,
@@ -87,25 +87,72 @@ export function ScoresDashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* User Identity */}
+    <div className="space-y-6 flex flex-col items-center p-4">
+      {/* Onchain Profile Card */}
       {address && (
-        <div className="text-center">
-          <UserIdentity identity={scores?.identity ?? null} address={address} />
-        </div>
+        <OnchainProfileCard
+          address={address}
+          identity={scores?.identity ?? null}
+          ssaIndex={scores?.ssaIndex?.score ?? null}
+          ssaTier={scores?.ssaIndex?.tier ?? null}
+          hasMintedSBT={hasMinted}
+        />
       )}
 
-      {/* SSA Index Hero Card */}
-      <div className="max-w-lg mx-auto space-y-4">
-        <SSAIndexCard data={scores?.ssaIndex ?? null} isLoading={isLoading} />
-        {/* Attest On-Chain Button */}
-        {scores && !isLoading && (
-          <SubmitScoresButton disabled={!scores.ssaIndex} />
-        )}
-      </div>
-
       {/* Provider Score Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 max-w-6xl w-full">
+        {/* SSA Index Card */}
+        <div className="mac1-window bg-white p-1">
+          <div className="mac1-title-bar mb-2">
+            <h3 className="uppercase text-[11px]">SSA Index</h3>
+          </div>
+          <div className="mac1-inset bg-white p-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold">Max: 100</span>
+            </div>
+            <p className="text-[11px] mb-4 italic text-black">
+              Social Score Attestation Index
+            </p>
+
+            {isLoading ? (
+              <>
+                <div className="h-8 w-16 bg-[#E8E8E8] mb-3 animate-pulse" />
+                <div className="h-4 w-full bg-[#E8E8E8] animate-pulse" />
+              </>
+            ) : scores?.ssaIndex ? (
+              <>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-3xl font-bold text-black">
+                    {scores.ssaIndex.score}
+                  </span>
+                  {scores.ssaIndex.tier && (
+                    <span className="text-[11px] text-black capitalize">
+                      {scores.ssaIndex.tier}
+                    </span>
+                  )}
+                </div>
+                <div
+                  role="progressbar"
+                  aria-valuenow={scores.ssaIndex.score}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`SSA Index: ${scores.ssaIndex.score}`}
+                  className="h-4 w-full mac1-inset bg-white"
+                >
+                  <div
+                    className="h-full bg-[#000000] transition-all duration-500"
+                    style={{ width: `${scores.ssaIndex.score}%` }}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <span className="text-black text-[11px]">No scores yet</span>
+              </div>
+            )}
+          </div>
+        </div>
+
         <ScoreCard
           provider="neynar"
           data={scores?.neynar ?? null}

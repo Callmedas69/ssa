@@ -49,8 +49,8 @@ interface MintVoucherResponse {
   success: boolean;
   voucher?: {
     user: Hex;
-    expiresAt: bigint;
-    nonce: bigint;
+    expiresAt: string;
+    nonce: string;
   };
   signature?: Hex;
   error?: string;

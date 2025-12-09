@@ -3,6 +3,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: 'Chicago';
+  src: url('/fonts/Chicago.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -44,6 +52,7 @@
 }
 
 :root {
+  /* Modern Theme (Default) */
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -76,6 +85,29 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* MacOS System 1 Theme */
+[data-theme="mac1"] {
+  --radius: 0px;
+  --background: #FFFFFF;
+  --foreground: #000000;
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+  --popover: #FFFFFF;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFFFFF;
+  --secondary-foreground: #000000;
+  --muted: #E8E8E8;
+  --muted-foreground: #000000;
+  --accent: #000000;
+  --accent-foreground: #FFFFFF;
+  --destructive: #000000;
+  --border: #000000;
+  --input: #FFFFFF;
+  --ring: #000000;
 }
 
 .dark {
@@ -118,5 +150,235 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Chicago", "VT323", "Courier New", monospace;
   }
+}
+
+/* MacOS System 1 Effects - Only visible in mac1 theme */
+[data-theme="mac1"] .mac1-inset,
+[data-theme="mac1"] .mac1-outset,
+[data-theme="mac1"] .mac1-window,
+[data-theme="mac1"] .mac1-title-bar,
+[data-theme="mac1"] .mac1-button {
+  display: block;
+}
+
+/* MacOS System 1 Styles */
+.mac1-inset {
+  border: 2px solid #000000;
+  border-radius: 0;
+  background: #FFFFFF;
+  box-shadow: inset 1px 1px 0 #000000;
+}
+
+.mac1-outset {
+  border: 2px solid #000000;
+  border-radius: 0;
+  background: #FFFFFF;
+}
+
+.mac1-window {
+  background: #FFFFFF;
+  border: 2px solid #000000;
+  border-radius: 0;
+  box-shadow: none;
+  position: relative;
+  overflow: visible;
+}
+
+.mac1-title-bar {
+  background: #FFFFFF;
+  color: #000000;
+  border-bottom: 2px solid #000000;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+  font-family: 'Chicago', 'VT323', monospace;
+}
+
+.mac1-button {
+  background: #FFFFFF;
+  border: 2px solid #000000;
+  border-radius: 0;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-family: 'Chicago', 'VT323', monospace;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: none;
+}
+
+.mac1-button:hover {
+  background: #000000;
+  color: #FFFFFF;
+}
+
+.mac1-button:active {
+  background: #000000;
+  color: #FFFFFF;
+  transform: scale(0.98);
+}
+
+.mac1-button:disabled {
+  border-color: #E8E8E8;
+  color: #E8E8E8;
+  cursor: not-allowed;
+  background: #FFFFFF;
+}
+
+/* RainbowKit MacOS System 1 Overrides */
+[data-theme="mac1"] [data-rk] {
+  border-radius: 6px !important;
+  font-family: 'Chicago', 'VT323', monospace !important;
+}
+
+/* Wallet Modal Container */
+[data-theme="mac1"] div[role="dialog"][data-rk] {
+  border-radius: 6px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  box-shadow: none !important;
+}
+
+[data-theme="mac1"] div[role="dialog"] > div[data-rk] {
+  border-radius: 6px !important;
+  background: #FFFFFF !important;
+}
+
+/* Modal Header/Title */
+[data-theme="mac1"] div[data-rk] > div:first-child {
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  font-weight: bold !important;
+  border-radius: 6px 6px 0 0 !important;
+  border-bottom: 2px solid #000000 !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  text-align: center !important;
+}
+
+/* Modal Content Area */
+[data-theme="mac1"] div[data-rk] h1,
+[data-theme="mac1"] div[data-rk] h2,
+[data-theme="mac1"] div[data-rk] h3 {
+  font-family: 'Chicago', 'VT323', monospace !important;
+  color: #000000 !important;
+}
+
+/* Wallet List Items */
+[data-theme="mac1"] button[data-rk] {
+  border-radius: 8px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  color: #000000 !important;
+  font-weight: normal !important;
+  padding: 6px 12px !important;
+  margin: 2px 0 !important;
+  transition: all 0.1s ease !important;
+  box-shadow: none !important;
+}
+
+[data-theme="mac1"] button[data-rk]:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="mac1"] button[data-rk]:active,
+[data-theme="mac1"] button[data-rk][data-active="true"] {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  transform: scale(0.98) !important;
+}
+
+/* Get a Wallet Button */
+[data-theme="mac1"] a[data-rk] {
+  border-radius: 8px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  color: #000000 !important;
+  text-decoration: none !important;
+}
+
+[data-theme="mac1"] a[data-rk]:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Close Button */
+[data-theme="mac1"] button[aria-label*="Close"][data-rk] {
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  border-radius: 4px !important;
+  width: 16px !important;
+  height: 14px !important;
+  padding: 0 !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  color: #000000 !important;
+}
+
+/* Modal Backdrop */
+[data-theme="mac1"] div[data-rk][style*="position: fixed"] {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ensure border-radius on all RainbowKit elements */
+[data-theme="mac1"] *[data-rk] {
+  border-radius: 6px !important;
+}
+
+[data-theme="mac1"] *[data-rk] * {
+  border-radius: 6px !important;
+}
+
+/* Wallet Icons */
+[data-theme="mac1"] img[data-rk] {
+  border: 1px solid #000000 !important;
+  border-radius: 0 !important;
+}
+
+/* Account Modal Styling */
+[data-theme="mac1"] div[data-rk] > div > div {
+  background: #FFFFFF !important;
+  border-radius: 6px !important;
+}
+
+/* Override RainbowKit inline styles with higher specificity */
+[data-theme="mac1"] div[data-rk][style] {
+  border-radius: 6px !important;
+}
+
+[data-theme="mac1"] button[data-rk][style] {
+  border-radius: 8px !important;
+}
+
+/* Account modal specific */
+[data-theme="mac1"] div[role="dialog"] {
+  border-radius: 6px !important;
+}
+
+[data-theme="mac1"] div[role="dialog"] > div {
+  border-radius: 6px !important;
+  background: #FFFFFF !important;
+}
+
+[data-theme="mac1"] div[role="dialog"] button {
+  border-radius: 8px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  color: #000000 !important;
+  box-shadow: none !important;
+}
+
+[data-theme="mac1"] div[role="dialog"] button:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="mac1"] div[role="dialog"] button:active {
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  transform: scale(0.98) !important;
 }
