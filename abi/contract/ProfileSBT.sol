@@ -93,6 +93,12 @@ contract ProfileSBT is
     /// @notice Emitted when a token is unlocked
     event Unlocked(uint256 indexed tokenId);
 
+    // ERC-4906: Metadata Update Events
+    /// @notice Emitted when metadata for a single token is updated
+    event MetadataUpdate(uint256 _tokenId);
+    /// @notice Emitted when metadata for a range of tokens is updated
+    event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId);
+
     // ------------------------------------------------------------------------
     // Errors
     // ------------------------------------------------------------------------
@@ -294,7 +300,7 @@ contract ProfileSBT is
     }
 
     /// @notice ERC-165 interface detection
-    /// @dev Supports ERC-721, ERC-165, and EIP-5192 interfaces
+    /// @dev Supports ERC-721, ERC-165, EIP-5192, and ERC-4906 interfaces
     function supportsInterface(bytes4 interfaceId)
         public
         view
@@ -302,7 +308,8 @@ contract ProfileSBT is
         returns (bool)
     {
         return
-            interfaceId == 0xb45a3c0e || // EIP-5192
+            interfaceId == 0xb45a3c0e || // EIP-5192 (Soulbound)
+            interfaceId == 0x49064906 || // ERC-4906 (Metadata Update)
             super.supportsInterface(interfaceId);
     }
 
@@ -346,5 +353,24 @@ contract ProfileSBT is
         require(renderer != address(0), "Renderer not set");
 
         return IProfileSBTRenderer(renderer).generateContractURI(name(), _collectionExternalLink);
+    }
+
+    // ------------------------------------------------------------------------
+    // ERC-4906: Metadata Update
+    // ------------------------------------------------------------------------
+
+    /// @notice Emit metadata update event for a single token
+    /// @dev Call this when a user's SSA scores have been updated
+    function emitMetadataUpdate(uint256 tokenId) external {
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
+        emit MetadataUpdate(tokenId);
+    }
+
+    /// @notice Emit metadata update event for all tokens
+    /// @dev Call this after renderer upgrade or batch score updates
+    function emitBatchMetadataUpdate() external {
+        if (_tokenIdCounter > 0) {
+            emit BatchMetadataUpdate(1, _tokenIdCounter);
+        }
     }
 }

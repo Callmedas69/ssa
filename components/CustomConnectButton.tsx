@@ -43,8 +43,8 @@ export function CustomConnectButton() {
                     type="button"
                     className={
                       theme === "mac1"
-                        ? "mac1-button"
-                        : "rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                        ? "mac1-button min-h-11"
+                        : "rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 min-h-11"
                     }
                     aria-label="Connect cryptocurrency wallet"
                   >
@@ -60,8 +60,8 @@ export function CustomConnectButton() {
                     type="button"
                     className={
                       theme === "mac1"
-                        ? "mac1-button"
-                        : "rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                        ? "mac1-button min-h-11"
+                        : "rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 min-h-11"
                     }
                   >
                     Wrong network
@@ -75,16 +75,8 @@ export function CustomConnectButton() {
                   type="button"
                   className={
                     theme === "mac1"
-                      ? "mac1-button sm:mac1-button sm:border-2"
-                      : "rounded-xl bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"
-                  }
-                  style={
-                    theme === "mac1"
-                      ? {
-                          border: "none",
-                          padding: "0.5rem",
-                        }
-                      : undefined
+                      ? "mac1-button-icon min-h-11 min-w-11 flex items-center justify-center sm:mac1-button sm:min-h-0 sm:min-w-0"
+                      : "rounded-xl bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 min-h-11"
                   }
                 >
                   <span className="hidden sm:inline">

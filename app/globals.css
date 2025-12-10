@@ -204,16 +204,16 @@
 }
 
 .mac1-button {
-  background: #FFFFFF;
-  border: 2px solid #000000;
-  border-radius: 0;
+  background: #FFFFFF !important;
+  border: 2px solid #000000 !important;
+  border-radius: 0 !important;
   padding: 6px 16px;
   font-size: 12px;
   font-family: 'Chicago', 'VT323', monospace;
-  color: #000000;
+  color: #000000 !important;
   cursor: pointer;
   transition: all 0.1s ease;
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .mac1-button:hover {
@@ -234,166 +234,22 @@
   background: #FFFFFF;
 }
 
-/* RainbowKit MacOS System 1 Overrides */
-[data-theme="mac1"] [data-rk] {
-  border-radius: 0px !important;
-  font-family: 'Chicago', 'VT323', monospace !important;
+.mac1-button:focus-visible {
+  outline: 3px solid #000000;
+  outline-offset: 2px;
 }
 
-/* Wallet Modal Container */
-[data-theme="mac1"] div[role="dialog"][data-rk] {
-  border-radius: 0px !important;
-  background: #FFFFFF !important;
-  border: 2px solid #000000 !important;
-  box-shadow: none !important;
-}
-
-[data-theme="mac1"] div[role="dialog"] > div[data-rk] {
-  border-radius: 0px !important;
-  background: #FFFFFF !important;
-}
-
-/* Modal Header/Title */
-[data-theme="mac1"] div[data-rk] > div:first-child {
-  background: #FFFFFF !important;
-  color: #000000 !important;
-  font-weight: bold !important;
-  border-radius: 0px !important;
-  border-bottom: 2px solid #000000 !important;
-  padding: 4px 8px !important;
-  font-size: 12px !important;
-  text-align: center !important;
-}
-
-/* Modal Content Area */
-[data-theme="mac1"] div[data-rk] h1,
-[data-theme="mac1"] div[data-rk] h2,
-[data-theme="mac1"] div[data-rk] h3 {
-  font-family: 'Chicago', 'VT323', monospace !important;
-  color: #000000 !important;
-}
-
-/* Wallet List Items */
-[data-theme="mac1"] button[data-rk] {
-  border-radius: 0px !important;
-  background: #FFFFFF !important;
-  border: 2px solid #000000 !important;
-  color: #000000 !important;
-  font-weight: normal !important;
-  padding: 6px 12px !important;
-  margin: 2px 0 !important;
-  transition: all 0.1s ease !important;
-  box-shadow: none !important;
-}
-
-[data-theme="mac1"] button[data-rk]:hover {
-  background: #000000 !important;
-  color: #FFFFFF !important;
-}
-
-[data-theme="mac1"] button[data-rk]:active,
-[data-theme="mac1"] button[data-rk][data-active="true"] {
-  background: #000000 !important;
-  color: #FFFFFF !important;
-  transform: scale(0.98) !important;
-}
-
-/* Get a Wallet Button */
-[data-theme="mac1"] a[data-rk] {
-  border-radius: 0px !important;
-  background: #FFFFFF !important;
-  border: 2px solid #000000 !important;
-  color: #000000 !important;
-  text-decoration: none !important;
-  padding: 6px 12px !important;
-  display: inline-block !important;
-  transition: all 0.1s ease !important;
-}
-
-[data-theme="mac1"] a[data-rk]:hover {
-  background: #000000 !important;
-  color: #FFFFFF !important;
-}
-
-/* Close Button */
-[data-theme="mac1"] button[aria-label*="Close"][data-rk] {
-  background: #FFFFFF !important;
-  border: 2px solid #000000 !important;
-  border-radius: 0px !important;
-  width: 16px !important;
-  height: 14px !important;
-  padding: 0 !important;
-  font-size: 10px !important;
-  line-height: 1 !important;
-  color: #000000 !important;
-  transition: all 0.1s ease !important;
-}
-
-[data-theme="mac1"] button[aria-label*="Close"][data-rk]:hover {
-  background: #000000 !important;
-  color: #FFFFFF !important;
-}
-
-/* Modal Backdrop */
-[data-theme="mac1"] div[data-rk][style*="position: fixed"] {
-  background: rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Ensure border-radius on all RainbowKit elements */
-[data-theme="mac1"] *[data-rk] {
-  border-radius: 0px !important;
-}
-
-[data-theme="mac1"] *[data-rk] * {
-  border-radius: 0px !important;
-}
-
-/* Wallet Icons */
-[data-theme="mac1"] img[data-rk] {
-  border: 1px solid #000000 !important;
+/* Icon-only button variant - no border */
+.mac1-button-icon {
+  background: transparent !important;
+  border: none !important;
   border-radius: 0 !important;
-}
-
-/* Account Modal Styling */
-[data-theme="mac1"] div[data-rk] > div > div {
-  background: #FFFFFF !important;
-  border-radius: 0px !important;
-}
-
-/* Override RainbowKit inline styles with higher specificity */
-[data-theme="mac1"] div[data-rk][style] {
-  border-radius: 0px !important;
-}
-
-[data-theme="mac1"] button[data-rk][style] {
-  border-radius: 0px !important;
-}
-
-/* Account modal specific */
-[data-theme="mac1"] div[role="dialog"] {
-  border-radius: 0px !important;
-}
-
-[data-theme="mac1"] div[role="dialog"] > div {
-  border-radius: 0px !important;
-  background: #FFFFFF !important;
-}
-
-[data-theme="mac1"] div[role="dialog"] button {
-  border-radius: 0px !important;
-  background: #FFFFFF !important;
-  border: 2px solid #000000 !important;
-  color: #000000 !important;
+  padding: 4px;
+  cursor: pointer;
   box-shadow: none !important;
 }
 
-[data-theme="mac1"] div[role="dialog"] button:hover {
-  background: #000000 !important;
-  color: #FFFFFF !important;
-}
-
-[data-theme="mac1"] div[role="dialog"] button:active {
-  background: #000000 !important;
-  color: #FFFFFF !important;
-  transform: scale(0.98) !important;
+.mac1-button-icon:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
 }

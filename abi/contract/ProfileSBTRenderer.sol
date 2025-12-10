@@ -5,16 +5,25 @@ pragma solidity ^0.8.24;
 /// @notice Upgradeable renderer for ProfileSBT metadata and SVG generation
 /// @dev Separated from ProfileSBT to allow independent design updates
 
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {
+    Initializable
+} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {
+    UUPSUpgradeable
+} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {
+    OwnableUpgradeable
+} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {IProfileSBTRenderer} from "./IProfileSBTRenderer.sol";
 
 interface ISocialScoreAttestator {
     function ssaIndexScores(address user) external view returns (uint256);
-    function providerScores(address user, bytes32 providerId) external view returns (uint256 score, uint256 updatedAt);
+    function providerScores(
+        address user,
+        bytes32 providerId
+    ) external view returns (uint256 score, uint256 updatedAt);
     function PROVIDER_ETHOS() external view returns (bytes32);
     function PROVIDER_NEYNAR() external view returns (bytes32);
     function PROVIDER_TALENT_BUILDER() external view returns (bytes32);
@@ -49,6 +58,20 @@ contract ProfileSBTRenderer is
     event ExternalBaseUrlUpdated(string oldUrl, string newUrl);
 
     // ------------------------------------------------------------------------
+    // Constants: Braille Colors
+    // ------------------------------------------------------------------------
+
+    /// @dev 8 Braille dot colors - Neon/Web3 palette
+    string internal constant COLOR_0 = "#00f5d4"; // Cyan
+    string internal constant COLOR_1 = "#fee440"; // Electric Yellow
+    string internal constant COLOR_2 = "#f15bb5"; // Hot Pink
+    string internal constant COLOR_3 = "#9b5de5"; // Purple
+    string internal constant COLOR_4 = "#00bbf9"; // Sky Blue
+    string internal constant COLOR_5 = "#fb5607"; // Orange
+    string internal constant COLOR_6 = "#8ac926"; // Lime
+    string internal constant COLOR_7 = "#ff006e"; // Magenta
+
+    // ------------------------------------------------------------------------
     // Init / Upgrade
     // ------------------------------------------------------------------------
 
@@ -62,7 +85,9 @@ contract ProfileSBTRenderer is
         __Ownable_init(msg.sender);
     }
 
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
 
     // ------------------------------------------------------------------------
     // Admin
@@ -85,37 +110,57 @@ contract ProfileSBTRenderer is
         address scoreAttestator
     ) external view override returns (string memory) {
         // Fetch scores
-        (uint256 ssaIndex, uint256[6] memory scores) = _fetchScores(owner, scoreAttestator);
+        (uint256 ssaIndex, uint256[6] memory scores) = _fetchScores(
+            owner,
+            scoreAttestator
+        );
 
         // Generate SVG
         string memory svg = _generateSVG(owner, tokenId, ssaIndex, scores);
 
         // Build JSON metadata
-        string memory json = string(abi.encodePacked(
-            '{"name":"SSA Profile #', tokenId.toString(), '",',
-            '"description":"Social Score Attestation Profile - Soulbound Token",',
-            '"image":"data:image/svg+xml;base64,', Base64.encode(bytes(svg)), '"'
-        ));
+        string memory json = string(
+            abi.encodePacked(
+                '{"name":"SSA Profile #',
+                tokenId.toString(),
+                '",',
+                '"description":"Social Score Attestation Profile - Soulbound Token",',
+                '"image":"data:image/svg+xml;base64,',
+                Base64.encode(bytes(svg)),
+                '"'
+            )
+        );
 
         // Add external_url only if base URL is set
         if (bytes(externalBaseUrl).length > 0) {
-            json = string(abi.encodePacked(
-                json,
-                ',"external_url":"', externalBaseUrl, Strings.toHexString(uint160(owner), 20), '"'
-            ));
+            json = string(
+                abi.encodePacked(
+                    json,
+                    ',"external_url":"',
+                    externalBaseUrl,
+                    Strings.toHexString(uint160(owner), 20),
+                    '"'
+                )
+            );
         }
 
         // Add attributes and close JSON
-        json = string(abi.encodePacked(
-            json,
-            ',"attributes":', _buildAttributes(ssaIndex, scores),
-            '}'
-        ));
+        json = string(
+            abi.encodePacked(
+                json,
+                ',"attributes":',
+                _buildAttributes(ssaIndex, scores),
+                "}"
+            )
+        );
 
-        return string(abi.encodePacked(
-            'data:application/json;base64,',
-            Base64.encode(bytes(json))
-        ));
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(bytes(json))
+                )
+            );
     }
 
     /// @inheritdoc IProfileSBTRenderer
@@ -125,31 +170,41 @@ contract ProfileSBTRenderer is
     ) external pure override returns (string memory) {
         string memory collectionSvg = _generateCollectionSVG();
 
-        string memory json = string(abi.encodePacked(
-            '{"name":"', collectionName, '",',
-            '"description":"Social Score Attestation Profile - Soulbound Tokens reputation scores.",',
-            '"image":"data:image/svg+xml;base64,', Base64.encode(bytes(collectionSvg)), '"'
-        ));
+        string memory json = string(
+            abi.encodePacked(
+                '{"name":"',
+                collectionName,
+                '",',
+                '"description":"Social Score Attestation Profile - Soulbound Tokens reputation scores.",',
+                '"image":"data:image/svg+xml;base64,',
+                Base64.encode(bytes(collectionSvg)),
+                '"'
+            )
+        );
 
         // Add external_link only if set
         if (bytes(externalLink).length > 0) {
-            json = string(abi.encodePacked(
-                json,
-                ',"external_link":"', externalLink, '"'
-            ));
+            json = string(
+                abi.encodePacked(json, ',"external_link":"', externalLink, '"')
+            );
         }
 
         // No royalties for SBT (non-transferable)
-        json = string(abi.encodePacked(
-            json,
-            ',"seller_fee_basis_points":0',
-            ',"fee_recipient":"0x0000000000000000000000000000000000000000"}'
-        ));
+        json = string(
+            abi.encodePacked(
+                json,
+                ',"seller_fee_basis_points":0',
+                ',"fee_recipient":"0x0000000000000000000000000000000000000000"}'
+            )
+        );
 
-        return string(abi.encodePacked(
-            'data:application/json;base64,',
-            Base64.encode(bytes(json))
-        ));
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(bytes(json))
+                )
+            );
     }
 
     // ------------------------------------------------------------------------
@@ -165,47 +220,61 @@ contract ProfileSBTRenderer is
             return (0, scores);
         }
 
-        ISocialScoreAttestator attestator = ISocialScoreAttestator(scoreAttestator);
-        
+        ISocialScoreAttestator attestator = ISocialScoreAttestator(
+            scoreAttestator
+        );
+
         // Fetch SSA Index with try-catch to prevent DoS
         try attestator.ssaIndexScores(user) returns (uint256 index) {
             ssaIndex = index;
         } catch {
             ssaIndex = 0;
         }
-
         // Fetch provider scores with try-catch for each provider
-        try attestator.providerScores(user, attestator.PROVIDER_ETHOS()) returns (uint256 score, uint256) {
+        try
+            attestator.providerScores(user, attestator.PROVIDER_ETHOS())
+        returns (uint256 score, uint256) {
             scores[0] = score;
         } catch {
             scores[0] = 0;
         }
-
-        try attestator.providerScores(user, attestator.PROVIDER_NEYNAR()) returns (uint256 score, uint256) {
+        try
+            attestator.providerScores(user, attestator.PROVIDER_NEYNAR())
+        returns (uint256 score, uint256) {
             scores[1] = score;
         } catch {
             scores[1] = 0;
         }
-
-        try attestator.providerScores(user, attestator.PROVIDER_TALENT_BUILDER()) returns (uint256 score, uint256) {
+        try
+            attestator.providerScores(
+                user,
+                attestator.PROVIDER_TALENT_BUILDER()
+            )
+        returns (uint256 score, uint256) {
             scores[2] = score;
         } catch {
             scores[2] = 0;
         }
-
-        try attestator.providerScores(user, attestator.PROVIDER_TALENT_CREATOR()) returns (uint256 score, uint256) {
+        try
+            attestator.providerScores(
+                user,
+                attestator.PROVIDER_TALENT_CREATOR()
+            )
+        returns (uint256 score, uint256) {
             scores[3] = score;
         } catch {
             scores[3] = 0;
         }
-
-        try attestator.providerScores(user, attestator.PROVIDER_PASSPORT()) returns (uint256 score, uint256) {
+        try
+            attestator.providerScores(user, attestator.PROVIDER_PASSPORT())
+        returns (uint256 score, uint256) {
             scores[4] = score;
         } catch {
             scores[4] = 0;
         }
-
-        try attestator.providerScores(user, attestator.PROVIDER_QUOTIENT()) returns (uint256 score, uint256) {
+        try
+            attestator.providerScores(user, attestator.PROVIDER_QUOTIENT())
+        returns (uint256 score, uint256) {
             scores[5] = score;
         } catch {
             scores[5] = 0;
@@ -217,130 +286,200 @@ contract ProfileSBTRenderer is
     // ------------------------------------------------------------------------
 
     /// @dev Build JSON attributes array
-    function _buildAttributes(uint256 ssaIndex, uint256[6] memory scores) internal pure returns (string memory) {
-        return string(abi.encodePacked(
-            '[{"trait_type":"SSA Index","value":', ssaIndex.toString(), '},',
-            '{"trait_type":"Ethos","value":', scores[0].toString(), '},',
-            '{"trait_type":"Neynar","value":', scores[1].toString(), '},',
-            '{"trait_type":"Talent Builder","value":', scores[2].toString(), '},',
-            '{"trait_type":"Talent Creator","value":', scores[3].toString(), '},',
-            '{"trait_type":"Passport","value":', scores[4].toString(), '},',
-            '{"trait_type":"Quotient","value":', scores[5].toString(), '}]'
-        ));
+    function _buildAttributes(
+        uint256 ssaIndex,
+        uint256[6] memory scores
+    ) internal pure returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    '[{"trait_type":"SSA Index","value":',
+                    ssaIndex.toString(),
+                    "},",
+                    '{"trait_type":"Ethos","value":',
+                    scores[0].toString(),
+                    "},",
+                    '{"trait_type":"Neynar","value":',
+                    scores[1].toString(),
+                    "},",
+                    '{"trait_type":"Talent Builder","value":',
+                    scores[2].toString(),
+                    "},",
+                    '{"trait_type":"Talent Creator","value":',
+                    scores[3].toString(),
+                    "},",
+                    '{"trait_type":"Passport","value":',
+                    scores[4].toString(),
+                    "},",
+                    '{"trait_type":"Quotient","value":',
+                    scores[5].toString(),
+                    "}]"
+                )
+            );
     }
 
     // ------------------------------------------------------------------------
-    // Internal: SVG Generation
+    // Internal: SVG Generation (Braille)
     // ------------------------------------------------------------------------
 
-    /// @dev Generate SVG image for token
+    /// @dev Generate SVG image for token - Braille representation of SSA Index
+    /// @param owner Not used in SVG (kept for signature compatibility)
+    /// @param tokenId Used for color rotation per token
+    /// @param ssaIndex Primary visual data (0-99, clamped)
+    /// @param scores Not used in SVG (kept in metadata only)
     function _generateSVG(
         address owner,
         uint256 tokenId,
         uint256 ssaIndex,
         uint256[6] memory scores
     ) internal pure returns (string memory) {
-        return string(abi.encodePacked(
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
-            '<defs>',
-            '<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">',
-            '<stop offset="0%" style="stop-color:#1a1a2e"/>',
-            '<stop offset="100%" style="stop-color:#16213e"/>',
-            '</linearGradient>',
-            '</defs>',
-            '<rect width="512" height="512" fill="url(#bg)"/>',
-            _renderHeader(tokenId, ssaIndex),
-            _renderAddress(owner),
-            _renderScoreBars(scores),
-            '</svg>'
-        ));
+        // Silence unused variable warnings
+        owner;
+        scores;
+
+        // Clamp ssaIndex to max 99
+        if (ssaIndex > 99) {
+            ssaIndex = 99;
+        }
+
+        // Split into two digits
+        uint256 leftDigit = ssaIndex / 10;
+        uint256 rightDigit = ssaIndex % 10;
+
+        // Get patterns for both digits
+        bool[6] memory leftPattern = _getBraillePattern(leftDigit);
+        bool[6] memory rightPattern = _getBraillePattern(rightDigit);
+
+        return
+            string(
+                abi.encodePacked(
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
+                    '<style>.d{animation:c 8s linear infinite}@keyframes c{to{filter:hue-rotate(360deg)}}</style>',
+                    '<rect width="512" height="512" fill="#2e293a"/>',
+                    _renderBrailleDigit(leftPattern, 64, tokenId, 0),
+                    _renderBrailleDigit(rightPattern, 266, tokenId, 1),
+                    "</svg>"
+                )
+            );
     }
 
-    /// @dev Render header with title and SSA score
-    function _renderHeader(uint256 tokenId, uint256 ssaIndex) internal pure returns (string memory) {
-        return string(abi.encodePacked(
-            '<text x="256" y="40" font-family="Arial,sans-serif" font-size="20" fill="#fff" text-anchor="middle" font-weight="bold">SSA PROFILE</text>',
-            '<rect x="196" y="60" width="120" height="60" rx="10" fill="#0f3460"/>',
-            '<text x="256" y="85" font-family="Arial,sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">SSA INDEX</text>',
-            '<text x="256" y="110" font-family="Arial,sans-serif" font-size="28" fill="#00d9ff" text-anchor="middle" font-weight="bold">', ssaIndex.toString(), '</text>',
-            '<text x="256" y="145" font-family="Arial,sans-serif" font-size="11" fill="#64748b" text-anchor="middle">#', tokenId.toString(), '</text>'
-        ));
+    /// @dev Get Braille pattern for a single digit (0-9)
+    /// @param digit The digit to get the pattern for
+    /// @return pattern Array of 6 booleans (true = filled, false = outline)
+    function _getBraillePattern(
+        uint256 digit
+    ) internal pure returns (bool[6] memory pattern) {
+        if (digit == 0) return [false, true, false, true, true, false];
+        if (digit == 1) return [true, false, false, false, false, false];
+        if (digit == 2) return [true, true, false, false, false, false];
+        if (digit == 3) return [true, false, false, true, false, false];
+        if (digit == 4) return [true, false, false, true, true, false];
+        if (digit == 5) return [true, false, false, false, true, false];
+        if (digit == 6) return [true, true, false, true, false, false];
+        if (digit == 7) return [true, true, false, true, true, false];
+        if (digit == 8) return [true, true, false, false, true, false];
+        if (digit == 9) return [false, true, false, true, false, false];
+        // Fallback (should never reach)
+        return [false, false, false, false, false, false];
     }
 
-    /// @dev Render truncated address
-    function _renderAddress(address owner) internal pure returns (string memory) {
-        return string(abi.encodePacked(
-            '<text x="256" y="170" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="middle">',
-            _truncateAddress(owner),
-            '</text>',
-            '<line x1="56" y1="190" x2="456" y2="190" stroke="#2d3748" stroke-width="1"/>'
-        ));
+    /// @dev Get color for a specific position based on tokenId rotation
+    /// @param position Position index (0-11)
+    /// @param tokenId Token ID for color rotation
+    /// @return Color hex string
+    function _getColor(
+        uint256 position,
+        uint256 tokenId
+    ) internal pure returns (string memory) {
+        uint256 colorIndex = (position + tokenId) % 8;
+        if (colorIndex == 0) return COLOR_0;
+        if (colorIndex == 1) return COLOR_1;
+        if (colorIndex == 2) return COLOR_2;
+        if (colorIndex == 3) return COLOR_3;
+        if (colorIndex == 4) return COLOR_4;
+        if (colorIndex == 5) return COLOR_5;
+        if (colorIndex == 6) return COLOR_6;
+        return COLOR_7;
     }
 
-    /// @dev Render all 6 score bars
-    function _renderScoreBars(uint256[6] memory scores) internal pure returns (string memory) {
-        string[6] memory labels = ["Ethos", "Neynar", "Talent Builder", "Talent Creator", "Passport", "Quotient"];
-        string memory bars = "";
+    /// @dev Render a single Braille digit (6 rectangles in 3x2 matrix)
+    /// @param pattern The 6-position pattern for the digit
+    /// @param xOffset Base X position (64 for left set, 266 for right set)
+    /// @param tokenId Token ID for color rotation
+    /// @param digitIndex 0 for left digit, 1 for right digit
+    /// @return SVG string for the 6 rectangles
+    function _renderBrailleDigit(
+        bool[6] memory pattern,
+        uint256 xOffset,
+        uint256 tokenId,
+        uint256 digitIndex
+    ) internal pure returns (string memory) {
+        // X positions: col1 = xOffset, col2 = xOffset + 101
+        // Y positions: row1 = 114, row2 = 216, row3 = 317
+        uint256[6] memory xPos = [
+            xOffset,
+            xOffset,
+            xOffset,
+            xOffset + 101,
+            xOffset + 101,
+            xOffset + 101
+        ];
+        uint256[6] memory yPos = [
+            uint256(114),
+            uint256(216),
+            uint256(317),
+            uint256(114),
+            uint256(216),
+            uint256(317)
+        ];
 
+        string memory rects = "";
         for (uint256 i = 0; i < 6; i++) {
-            uint256 y = 220 + (i * 45);
-            bars = string(abi.encodePacked(bars, _renderScoreBar(labels[i], scores[i], y)));
+            // Only render filled dots
+            if (pattern[i]) {
+                uint256 globalPosition = digitIndex * 6 + i;
+                string memory color = _getColor(globalPosition, tokenId);
+                rects = string(
+                    abi.encodePacked(
+                        rects,
+                        '<rect class="d" x="',
+                        xPos[i].toString(),
+                        '" y="',
+                        yPos[i].toString(),
+                        '" width="80" height="80" rx="16" fill="',
+                        color,
+                        '"/>'
+                    )
+                );
+            }
         }
 
-        return bars;
-    }
-
-    /// @dev Render single score bar
-    function _renderScoreBar(string memory label, uint256 score, uint256 y) internal pure returns (string memory) {
-        uint256 barWidth = (score * 200) / 100; // Max width 200px for score 100
-
-        return string(abi.encodePacked(
-            '<text x="56" y="', y.toString(), '" font-family="Arial,sans-serif" font-size="12" fill="#94a3b8">', label, '</text>',
-            '<rect x="200" y="', (y - 12).toString(), '" width="200" height="16" rx="4" fill="#1e293b"/>',
-            '<rect x="200" y="', (y - 12).toString(), '" width="', barWidth.toString(), '" height="16" rx="4" fill="#00d9ff"/>',
-            '<text x="410" y="', y.toString(), '" font-family="Arial,sans-serif" font-size="12" fill="#fff" text-anchor="end">', score.toString(), '</text>'
-        ));
-    }
-
-    /// @dev Truncate address to 0x1234...5678 format
-    function _truncateAddress(address addr) internal pure returns (string memory) {
-        bytes memory addrBytes = bytes(Strings.toHexString(uint160(addr), 20));
-        bytes memory result = new bytes(13);
-
-        // Copy first 6 chars (0x1234)
-        for (uint256 i = 0; i < 6; i++) {
-            result[i] = addrBytes[i];
-        }
-
-        // Add ellipsis
-        result[6] = '.';
-        result[7] = '.';
-        result[8] = '.';
-
-        // Copy last 4 chars
-        for (uint256 i = 0; i < 4; i++) {
-            result[9 + i] = addrBytes[addrBytes.length - 4 + i];
-        }
-
-        return string(result);
+        return rects;
     }
 
     /// @dev Generate collection logo SVG
     function _generateCollectionSVG() internal pure returns (string memory) {
-        return string(abi.encodePacked(
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
-            '<defs>',
-            '<linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">',
-            '<stop offset="0%" style="stop-color:#1a1a2e"/>',
-            '<stop offset="100%" style="stop-color:#16213e"/>',
-            '</linearGradient>',
-            '</defs>',
-            '<rect width="512" height="512" fill="url(#bg)"/>',
-            '<text x="256" y="230" font-family="Arial,sans-serif" font-size="48" fill="#fff" text-anchor="middle" font-weight="bold">SSA</text>',
-            '<text x="256" y="280" font-family="Arial,sans-serif" font-size="18" fill="#94a3b8" text-anchor="middle">PROFILE</text>',
-            '<rect x="156" y="310" width="200" height="4" rx="2" fill="#00d9ff"/>',
-            '<text x="256" y="360" font-family="Arial,sans-serif" font-size="12" fill="#64748b" text-anchor="middle">Soulbound Token</text>',
-            '</svg>'
-        ));
+        return
+            string(
+                abi.encodePacked(
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
+                    '<rect width="100%" height="100%" fill="#fff"/>',
+                    // LEFT SET
+                    '<circle cx="104" cy="154" r="40" fill="none" />',
+                    '<circle cx="104" cy="256" r="40" fill="none" />',
+                    '<circle cx="104" cy="357" r="40" fill="#000" />',
+                    '<circle cx="205" cy="154" r="40" fill="#000" />',
+                    '<circle cx="205" cy="256" r="40" fill="#000" />',
+                    '<circle cx="205" cy="357" r="40" fill="#000" />',
+                    // RIGHT SET
+                    '<circle cx="307" cy="154" r="40" fill="#fc401f" />',
+                    '<circle cx="307" cy="256" r="40" fill="#0000ff" />',
+                    '<circle cx="307" cy="357" r="40" fill="none" />',
+                    '<circle cx="408" cy="154" r="40" fill="none" />',
+                    '<circle cx="408" cy="256" r="40" fill="#ffd12f" />',
+                    '<circle cx="408" cy="357" r="40" fill="none" />',
+                    "</svg>"
+                )
+            );
     }
 }

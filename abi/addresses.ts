@@ -1,16 +1,16 @@
 // Contract addresses on Base Mainnet
 export const CONTRACTS = {
   // Profile SBT (proxy)
-  ProfileSBT: "0x4d4b5f15cdf4a0a6a45c8eb4459992eaa2a8ca07",
+  ProfileSBT: "0x4d4b5F15cdF4A0a6a45c8Eb4459992EAa2A8cA07",
 
-  // Profile SBT Implementation
-  ProfileSBTImplementation: "0x724De37Da7bD9eEEa1162Cc5DaDf81F7c14B9Ea4",
+  // Profile SBT Implementation (v2 - ERC-4906 + Braille Animation)
+  ProfileSBTImplementation: "0x33cD69060d54c0340894eF290a919BC91B55a8C6",
 
-  // Profile SBT Renderer (implementation)
-  ProfileSBTRenderer: "0xd4dadb25b70a27cae033ba4e37423611e83cc85e",
+  // Profile SBT Renderer Proxy
+  ProfileSBTRendererProxy: "0x26596556128c5F19FcAb8f1d3752eFFe562192aE",
 
-  // Profile SBT Renderer Proxy (optional)
-  ProfileSBTRendererProxy: "0x26596556128c5f19fcab8f1d3752effe562192ae",
+  // Profile SBT Renderer Implementation (v2 - Braille Animation)
+  ProfileSBTRenderer: "0x8eE7493837f03DD81552Ad457Cb684380a213846",
 
   // Social Score Attestator (UUPS Proxy)
   SocialScoreAttestator: "0xf02419b54aedd2c215feeb3eeedbf5ac30741dad",

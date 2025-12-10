@@ -393,6 +393,22 @@ export const ProfileSBTABI = [
         "stateMutability": "view"
     },
     {
+        "type": "function",
+        "name": "emitMetadataUpdate",
+        "inputs": [
+            { "name": "tokenId", "type": "uint256", "internalType": "uint256" }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "emitBatchMetadataUpdate",
+        "inputs": [],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
         "type": "event",
         "name": "Approval",
         "inputs": [
@@ -517,6 +533,23 @@ export const ProfileSBTABI = [
         "name": "Unlocked",
         "inputs": [
             { "name": "tokenId", "type": "uint256", "indexed": true, "internalType": "uint256" }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "MetadataUpdate",
+        "inputs": [
+            { "name": "_tokenId", "type": "uint256", "indexed": false, "internalType": "uint256" }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "BatchMetadataUpdate",
+        "inputs": [
+            { "name": "_fromTokenId", "type": "uint256", "indexed": false, "internalType": "uint256" },
+            { "name": "_toTokenId", "type": "uint256", "indexed": false, "internalType": "uint256" }
         ],
         "anonymous": false
     },
