@@ -154,6 +154,12 @@
   }
 }
 
+/* Mac1 Focus Indicators */
+[data-theme="mac1"] *:focus-visible {
+  outline: 3px solid #000000 !important;
+  outline-offset: 2px !important;
+}
+
 /* MacOS System 1 Effects - Only visible in mac1 theme */
 [data-theme="mac1"] .mac1-inset,
 [data-theme="mac1"] .mac1-outset,
@@ -222,28 +228,28 @@
 }
 
 .mac1-button:disabled {
-  border-color: #E8E8E8;
-  color: #E8E8E8;
+  border-color: #808080;
+  color: #808080;
   cursor: not-allowed;
   background: #FFFFFF;
 }
 
 /* RainbowKit MacOS System 1 Overrides */
 [data-theme="mac1"] [data-rk] {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
   font-family: 'Chicago', 'VT323', monospace !important;
 }
 
 /* Wallet Modal Container */
 [data-theme="mac1"] div[role="dialog"][data-rk] {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
   background: #FFFFFF !important;
   border: 2px solid #000000 !important;
   box-shadow: none !important;
 }
 
 [data-theme="mac1"] div[role="dialog"] > div[data-rk] {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
   background: #FFFFFF !important;
 }
 
@@ -252,7 +258,7 @@
   background: #FFFFFF !important;
   color: #000000 !important;
   font-weight: bold !important;
-  border-radius: 6px 6px 0 0 !important;
+  border-radius: 0px !important;
   border-bottom: 2px solid #000000 !important;
   padding: 4px 8px !important;
   font-size: 12px !important;
@@ -269,7 +275,7 @@
 
 /* Wallet List Items */
 [data-theme="mac1"] button[data-rk] {
-  border-radius: 8px !important;
+  border-radius: 0px !important;
   background: #FFFFFF !important;
   border: 2px solid #000000 !important;
   color: #000000 !important;
@@ -294,11 +300,14 @@
 
 /* Get a Wallet Button */
 [data-theme="mac1"] a[data-rk] {
-  border-radius: 8px !important;
+  border-radius: 0px !important;
   background: #FFFFFF !important;
   border: 2px solid #000000 !important;
   color: #000000 !important;
   text-decoration: none !important;
+  padding: 6px 12px !important;
+  display: inline-block !important;
+  transition: all 0.1s ease !important;
 }
 
 [data-theme="mac1"] a[data-rk]:hover {
@@ -310,13 +319,19 @@
 [data-theme="mac1"] button[aria-label*="Close"][data-rk] {
   background: #FFFFFF !important;
   border: 2px solid #000000 !important;
-  border-radius: 4px !important;
+  border-radius: 0px !important;
   width: 16px !important;
   height: 14px !important;
   padding: 0 !important;
   font-size: 10px !important;
   line-height: 1 !important;
   color: #000000 !important;
+  transition: all 0.1s ease !important;
+}
+
+[data-theme="mac1"] button[aria-label*="Close"][data-rk]:hover {
+  background: #000000 !important;
+  color: #FFFFFF !important;
 }
 
 /* Modal Backdrop */
@@ -326,11 +341,11 @@
 
 /* Ensure border-radius on all RainbowKit elements */
 [data-theme="mac1"] *[data-rk] {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
 }
 
 [data-theme="mac1"] *[data-rk] * {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
 }
 
 /* Wallet Icons */
@@ -342,30 +357,30 @@
 /* Account Modal Styling */
 [data-theme="mac1"] div[data-rk] > div > div {
   background: #FFFFFF !important;
-  border-radius: 6px !important;
+  border-radius: 0px !important;
 }
 
 /* Override RainbowKit inline styles with higher specificity */
 [data-theme="mac1"] div[data-rk][style] {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
 }
 
 [data-theme="mac1"] button[data-rk][style] {
-  border-radius: 8px !important;
+  border-radius: 0px !important;
 }
 
 /* Account modal specific */
 [data-theme="mac1"] div[role="dialog"] {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
 }
 
 [data-theme="mac1"] div[role="dialog"] > div {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
   background: #FFFFFF !important;
 }
 
 [data-theme="mac1"] div[role="dialog"] button {
-  border-radius: 8px !important;
+  border-radius: 0px !important;
   background: #FFFFFF !important;
   border: 2px solid #000000 !important;
   color: #000000 !important;

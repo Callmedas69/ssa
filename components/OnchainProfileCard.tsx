@@ -31,8 +31,8 @@ export function OnchainProfileCard({
     <div
       className={
         theme === "mac1"
-          ? "mac1-window bg-white p-1 max-w-2xl"
-          : "rounded-lg border border-border bg-card p-4 max-w-2xl"
+          ? "mac1-window bg-white p-1 max-w-2xl w-full"
+          : "rounded-lg border border-border bg-card p-4 max-w-2xl w-full"
       }
     >
       {theme === "mac1" && (
@@ -43,13 +43,15 @@ export function OnchainProfileCard({
       <div
         className={theme === "mac1" ? "mac1-inset bg-white p-4" : "space-y-4"}
       >
-        <div className="grid grid-cols-[auto_1fr] gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6">
           {/* Profile SBT Display */}
-          <ProfileSBTDisplay hasMinted={hasMintedSBT} />
+          <div className="flex justify-center md:justify-start">
+            <ProfileSBTDisplay hasMinted={hasMintedSBT} />
+          </div>
 
           {/* Profile Details */}
           <div className="space-y-4">
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-baseline justify-between gap-8">
                 <span className="text-[11px] font-bold text-black uppercase">
                   ENS
@@ -105,14 +107,14 @@ export function OnchainProfileCard({
               )}
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <div className="flex-1 min-w-[140px]">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3">
+              <div className="sm:flex-1 sm:min-w-[140px]">
                 <SubmitScoresButton
                   disabled={ssaIndex === null}
                   hasMinted={hasMintedSBT}
                 />
               </div>
-              <div className="flex-1 min-w-[140px]">
+              <div className="sm:flex-1 sm:min-w-[140px]">
                 <MintProfileButton
                   hasAttested={ssaIndex !== null && ssaIndex > 0}
                 />

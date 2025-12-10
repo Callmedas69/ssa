@@ -38,7 +38,7 @@ export function ProfileSBTDisplay({ hasMinted }: ProfileSBTDisplayProps) {
   }, [hasMinted]);
 
   return (
-    <div className="relative w-64 h-64 mac1-inset bg-white flex items-center justify-center">
+    <div className="relative w-full max-w-64 aspect-square mac1-inset bg-white flex items-center justify-center">
       {imageUrl ? (
         <Image src={imageUrl} alt="Profile SBT" fill className="object-cover" />
       ) : (

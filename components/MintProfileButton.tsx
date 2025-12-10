@@ -65,7 +65,7 @@ export function MintProfileButton({
   const getButtonContent = () => {
     if (hasMinted) {
       return (
-        <span className="inline-flex items-center gap-2">
+        <span className="flex items-center justify-center gap-2">
           <Check className="h-4 w-4" />
           Minted
         </span>
@@ -75,21 +75,21 @@ export function MintProfileButton({
     switch (state) {
       case "idle":
         return (
-          <span className="inline-flex items-center gap-2">
+          <span className="flex items-center justify-center gap-2">
             <Award className="h-4 w-4" />
             Mint
           </span>
         );
       case "checking":
         return (
-          <span className="inline-flex items-center gap-2">
+          <span className="flex items-center justify-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             Checking...
           </span>
         );
       case "fetching":
         return (
-          <span className="inline-flex items-center gap-2">
+          <span className="flex items-center justify-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             Preparing...
           </span>
@@ -97,28 +97,28 @@ export function MintProfileButton({
       case "ready":
       case "minting":
         return (
-          <span className="inline-flex items-center gap-2">
+          <span className="flex items-center justify-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             Minting...
           </span>
         );
       case "confirming":
         return (
-          <span className="inline-flex items-center gap-2">
+          <span className="flex items-center justify-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             Confirming...
           </span>
         );
       case "success":
         return (
-          <span className="inline-flex items-center gap-2">
+          <span className="flex items-center justify-center gap-2">
             <Check className="h-4 w-4" />
             Minted!
           </span>
         );
       case "error":
         return (
-          <span className="inline-flex items-center gap-2">
+          <span className="flex items-center justify-center gap-2">
             <AlertCircle className="h-4 w-4" />
             Try Again
           </span>
@@ -149,6 +149,11 @@ export function MintProfileButton({
             : "default"
         }
         className="w-full flex justify-center flex-row items-center"
+        aria-label={
+          hasMinted ? "Profile NFT already minted" : "Mint Profile NFT"
+        }
+        aria-busy={isLoading}
+        aria-disabled={isDisabled}
       >
         {getButtonContent()}
       </Button>

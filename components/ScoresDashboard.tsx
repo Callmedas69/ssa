@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { OnchainProfileCard } from "./OnchainProfileCard";
-import { ScoreCard } from "./ScoreCard";
 import { AllProviderGuidance } from "./ProviderGuidance";
 import { useHasMintedSBT } from "@/hooks/useHasMintedSBT";
 import type { SocialScores, ScoreApiResponse } from "@/lib/types";
@@ -37,7 +36,6 @@ async function fetchScores(address: string): Promise<SocialScores> {
 
 export function ScoresDashboard() {
   const { address, isConnected } = useAccount();
-  const [showGuidance, setShowGuidance] = useState(false);
   const { hasMinted } = useHasMintedSBT(address);
 
   const {
@@ -99,130 +97,203 @@ export function ScoresDashboard() {
         />
       )}
 
-      {/* Provider Score Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 max-w-6xl w-full">
-        {/* SSA Index Card */}
-        <div className="mac1-window bg-white p-1">
-          <div className="mac1-title-bar mb-2">
-            <h3 className="uppercase text-[11px]">SSA Index</h3>
+      {/* SSA Index Card */}
+      <div className="mac1-window bg-white p-1 max-w-2xl w-full">
+        <div className="mac1-title-bar mb-2">
+          <h3 className="uppercase text-[11px]">SSA Index</h3>
+        </div>
+        <div className="mac1-inset bg-white p-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[11px] font-bold">Max: 100</span>
           </div>
-          <div className="mac1-inset bg-white p-3">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-bold">Max: 100</span>
-            </div>
-            <p className="text-[11px] mb-4 italic text-black">
-              Social Score Attestation Index
-            </p>
+          <p className="text-[11px] mb-4 italic text-black">
+            Social Score Attestation Index
+          </p>
 
-            {isLoading ? (
-              <>
-                <div className="h-8 w-16 bg-[#E8E8E8] mb-3 animate-pulse" />
-                <div className="h-4 w-full bg-[#E8E8E8] animate-pulse" />
-              </>
-            ) : scores?.ssaIndex ? (
-              <>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-bold text-black">
-                    {scores.ssaIndex.score}
+          {isLoading ? (
+            <>
+              <div className="h-8 w-16 bg-[#E8E8E8] mb-3 animate-pulse" />
+              <div className="h-4 w-full bg-[#E8E8E8] animate-pulse" />
+            </>
+          ) : scores?.ssaIndex ? (
+            <>
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-3xl font-bold text-black">
+                  {scores.ssaIndex.score}
+                </span>
+                {scores.ssaIndex.tier && (
+                  <span className="text-[11px] text-black capitalize">
+                    {scores.ssaIndex.tier}
                   </span>
-                  {scores.ssaIndex.tier && (
-                    <span className="text-[11px] text-black capitalize">
-                      {scores.ssaIndex.tier}
-                    </span>
-                  )}
-                </div>
+                )}
+              </div>
+              <div
+                role="progressbar"
+                aria-valuenow={scores.ssaIndex.score}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`SSA Index: ${scores.ssaIndex.score}`}
+                className="h-4 w-full mac1-inset bg-white"
+              >
                 <div
-                  role="progressbar"
-                  aria-valuenow={scores.ssaIndex.score}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={`SSA Index: ${scores.ssaIndex.score}`}
-                  className="h-4 w-full mac1-inset bg-white"
-                >
+                  className="h-full bg-[#000000] transition-all duration-500"
+                  style={{ width: `${scores.ssaIndex.score}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-4">
+              <span className="text-black text-[11px]">No scores yet</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Score Breakdown */}
+      {scores && !isLoading && (
+        <div className="mac1-window bg-white p-1 max-w-2xl w-full">
+          <div className="mac1-title-bar mb-2">
+            <h3 className="uppercase text-[11px]">Provider Scores</h3>
+          </div>
+          <div className="mac1-inset bg-white p-3 space-y-2">
+            {/* Neynar */}
+            {scores.neynar && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-black w-24">
+                  Neynar
+                </span>
+                <span className="text-[11px] text-black font-mono w-12 text-right">
+                  {scores.neynar.score.toFixed(2)}
+                </span>
+                <div className="flex-1 h-3 mac1-inset bg-white">
                   <div
-                    className="h-full bg-[#000000] transition-all duration-500"
-                    style={{ width: `${scores.ssaIndex.score}%` }}
+                    className="h-full bg-[#000000] transition-all duration-300"
+                    style={{ width: `${(scores.neynar.score / 1) * 100}%` }}
                   />
                 </div>
-              </>
-            ) : (
-              <div className="text-center py-4">
-                <span className="text-black text-[11px]">No scores yet</span>
+                <span className="text-[11px] text-black w-8 text-right">1</span>
+              </div>
+            )}
+            {/* Ethos */}
+            {scores.ethos && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-black w-24">
+                  Ethos
+                </span>
+                <span className="text-[11px] text-black font-mono w-12 text-right">
+                  {scores.ethos.score}
+                </span>
+                <div className="flex-1 h-3 mac1-inset bg-white">
+                  <div
+                    className="h-full bg-[#000000] transition-all duration-300"
+                    style={{ width: `${(scores.ethos.score / 2800) * 100}%` }}
+                  />
+                </div>
+                <span className="text-[11px] text-black w-8 text-right">
+                  2800
+                </span>
+              </div>
+            )}
+            {/* Talent Builder */}
+            {scores.talentBuilder && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-black w-24">
+                  Talent Builder
+                </span>
+                <span className="text-[11px] text-black font-mono w-12 text-right">
+                  {scores.talentBuilder.score}
+                </span>
+                <div className="flex-1 h-3 mac1-inset bg-white">
+                  <div
+                    className="h-full bg-[#000000] transition-all duration-300"
+                    style={{
+                      width: `${Math.min(
+                        (scores.talentBuilder.score / 1000) * 100,
+                        100
+                      )}%`,
+                    }}
+                  />
+                </div>
+                <span className="text-[11px] text-black w-8 text-right">∞</span>
+              </div>
+            )}
+            {/* Talent Creator */}
+            {scores.talentCreator && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-black w-24">
+                  Talent Creator
+                </span>
+                <span className="text-[11px] text-black font-mono w-12 text-right">
+                  {scores.talentCreator.score}
+                </span>
+                <div className="flex-1 h-3 mac1-inset bg-white">
+                  <div
+                    className="h-full bg-[#000000] transition-all duration-300"
+                    style={{
+                      width: `${Math.min(
+                        (scores.talentCreator.score / 1000) * 100,
+                        100
+                      )}%`,
+                    }}
+                  />
+                </div>
+                <span className="text-[11px] text-black w-8 text-right">∞</span>
+              </div>
+            )}
+            {/* Quotient */}
+            {scores.quotient && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-black w-24">
+                  Quotient
+                </span>
+                <span className="text-[11px] text-black font-mono w-12 text-right">
+                  {scores.quotient.score.toFixed(2)}
+                </span>
+                <div className="flex-1 h-3 mac1-inset bg-white">
+                  <div
+                    className="h-full bg-[#000000] transition-all duration-300"
+                    style={{ width: `${scores.quotient.score * 100}%` }}
+                  />
+                </div>
+                <span className="text-[11px] text-black w-8 text-right">1</span>
+              </div>
+            )}
+            {/* Passport */}
+            {scores.passport && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-black w-24">
+                  Gitcoin Passport
+                </span>
+                <span className="text-[11px] text-black font-mono w-12 text-right">
+                  {scores.passport.score.toFixed(2)}
+                </span>
+                <div className="flex-1 h-3 mac1-inset bg-white">
+                  <div
+                    className="h-full bg-[#000000] transition-all duration-300"
+                    style={{ width: `${scores.passport.score}%` }}
+                  />
+                </div>
+                <span className="text-[11px] text-black w-8 text-right">
+                  100
+                </span>
               </div>
             )}
           </div>
         </div>
+      )}
 
-        <ScoreCard
-          provider="neynar"
-          data={scores?.neynar ?? null}
-          isLoading={isLoading}
-        />
-        <ScoreCard
-          provider="ethos"
-          data={scores?.ethos ?? null}
-          isLoading={isLoading}
-        />
-        <ScoreCard
-          provider="talentBuilder"
-          data={scores?.talentBuilder ?? null}
-          isLoading={isLoading}
-        />
-        <ScoreCard
-          provider="talentCreator"
-          data={scores?.talentCreator ?? null}
-          isLoading={isLoading}
-        />
-        <ScoreCard
-          provider="quotient"
-          data={scores?.quotient ?? null}
-          isLoading={isLoading}
-        />
-        <ScoreCard
-          provider="passport"
-          data={scores?.passport ?? null}
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* Improve Your Scores Section */}
+      {/* Improvement Tips Section */}
       {scores && !isLoading && (
-        <div className="space-y-4">
-          <button
-            onClick={() => setShowGuidance(!showGuidance)}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mx-auto"
-          >
-            <span>{showGuidance ? "Hide" : "Show"} improvement tips</span>
-            <svg
-              className={`w-4 h-4 transition-transform ${
-                showGuidance ? "rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-
-          {showGuidance && (
-            <AllProviderGuidance
-              scores={{
-                neynar: scores.neynar,
-                ethos: scores.ethos,
-                talentBuilder: scores.talentBuilder,
-                talentCreator: scores.talentCreator,
-                quotient: scores.quotient,
-                passport: scores.passport,
-              }}
-            />
-          )}
-        </div>
+        <AllProviderGuidance
+          scores={{
+            neynar: scores.neynar,
+            ethos: scores.ethos,
+            talentBuilder: scores.talentBuilder,
+            talentCreator: scores.talentCreator,
+            quotient: scores.quotient,
+            passport: scores.passport,
+          }}
+        />
       )}
     </div>
   );

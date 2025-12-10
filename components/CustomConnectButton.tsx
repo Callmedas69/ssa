@@ -46,6 +46,7 @@ export function CustomConnectButton() {
                         ? "mac1-button"
                         : "rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                     }
+                    aria-label="Connect cryptocurrency wallet"
                   >
                     Connect Wallet
                   </button>
@@ -69,61 +70,65 @@ export function CustomConnectButton() {
               }
 
               return (
-                <div className="flex gap-2 items-stretch">
-                  <button
-                    onClick={openChainModal}
-                    type="button"
-                    className={
-                      theme === "mac1"
-                        ? "mac1-button flex items-center gap-1 justify-center"
-                        : "rounded-xl bg-gray-800 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700 flex items-center gap-1 justify-center"
-                    }
-                  >
-                    {chain.hasIcon && (
-                      <div
-                        style={{
-                          background: chain.iconBackground,
-                          width: 12,
-                          height: 12,
-                          borderRadius: 0,
-                          overflow: "visible",
-                          marginRight: 4,
-                          display: "inline-flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        {chain.iconUrl && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            alt={chain.name ?? "Chain icon"}
-                            src={chain.iconUrl}
-                            style={{
-                              width: 12,
-                              height: 12,
-                              borderRadius: "50%",
-                            }}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {chain.name}
-                  </button>
-
-                  <button
-                    onClick={openAccountModal}
-                    type="button"
-                    className={
-                      theme === "mac1"
-                        ? "mac1-button"
-                        : "rounded-xl bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"
-                    }
-                  >
+                <button
+                  onClick={openAccountModal}
+                  type="button"
+                  className={
+                    theme === "mac1"
+                      ? "mac1-button sm:mac1-button sm:border-2"
+                      : "rounded-xl bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"
+                  }
+                  style={
+                    theme === "mac1"
+                      ? {
+                          border: "none",
+                          padding: "0.5rem",
+                        }
+                      : undefined
+                  }
+                >
+                  <span className="hidden sm:inline">
                     {account.displayName}
                     {account.displayBalance
                       ? ` (${account.displayBalance})`
                       : ""}
-                  </button>
-                </div>
+                  </span>
+                  <span className="sm:hidden">
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 64 64"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M52 2H10V4H8V54H10V62H52V54H54V4H52V2Z"
+                        fill="white"
+                      />
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M52 0H10V2H8V4H6V54H8V64H54V54H56V4H54V2H52V0ZM52 2V4H54V54H8V4H10V2H52ZM52 62H10V56H52V62Z"
+                        fill="black"
+                      />
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M48 6H14V8H12V34H14V36H48V34H50V8H48V6ZM48 8V34H14V8H48Z"
+                        fill="black"
+                      />
+                      <path
+                        d="M26 26H24V28H26V30H34V28H36V26H34V28H26V26Z"
+                        fill="black"
+                      />
+                      <path d="M32 14H30V22H28V24H32V14Z" fill="black" />
+                      <rect x="38" y="14" width="2" height="4" fill="black" />
+                      <rect x="22" y="14" width="2" height="4" fill="black" />
+                      <rect x="12" y="44" width="4" height="2" fill="black" />
+                      <rect x="37" y="44" width="12" height="2" fill="black" />
+                    </svg>
+                  </span>
+                </button>
               );
             })()}
           </div>

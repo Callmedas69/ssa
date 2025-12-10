@@ -35,42 +35,47 @@ export function SubmitScoresButton({
         return hasMinted ? "Update" : "Attest";
       case "signing":
         return (
-          <>
+          <span className="flex flex-row items-center justify-center">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Preparing...
-          </>
+          </span>
         );
       case "ready":
       case "submitting":
         return (
-          <>
+          <span className="flex flex-row items-center justify-center">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Submitting...
-          </>
+          </span>
         );
       case "confirming":
         return (
-          <>
+          <span className="flex flex-row items-center justify-center">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Confirming...
-          </>
+          </span>
         );
       case "success":
         return (
-          <>
+          <span className="flex flex-row items-center justify-center">
             <Check className="mr-2 h-4 w-4" />
             Attested!
-          </>
+          </span>
         );
       case "error":
         return (
-          <>
+          <span className="flex flex-row items-center justify-center">
             <AlertCircle className="mr-2 h-4 w-4" />
             Try Again
-          </>
+          </span>
         );
       case "cooldown":
-        return "Cooldown";
+        return (
+          <span className="flex flex-row items-center justify-center">
+            <AlertCircle className="mr-2 h-4 w-4" />
+            Cooldown
+          </span>
+        );
       default:
         return "Attest On-Chain";
     }
@@ -95,15 +100,27 @@ export function SubmitScoresButton({
             ? "secondary"
             : "default"
         }
-        className="w-full flex items-center justify-center"
+        className="w-full min-w-[140px] flex-1 flex items-center justify-center"
+        aria-label={
+          hasMinted
+            ? "Update social scores on-chain"
+            : "Attest social scores on-chain"
+        }
+        aria-busy={isLoading}
+        aria-disabled={isDisabled}
       >
         {getButtonContent()}
       </Button>
 
       {/* Error message with better formatting */}
       {error && (
-        <div className="space-y-1">
-          <p className="text-sm text-destructive text-center font-medium">
+        <div
+          className="space-y-2 mac1-inset bg-white p-2 border-2 border-black"
+          role="alert"
+          aria-live="assertive"
+        >
+          <p className="text-sm text-black text-center font-bold">
+            ⚠️{" "}
             {error.includes("No signed payload")
               ? "Failed to prepare attestation. Please try again."
               : error}
@@ -133,10 +150,10 @@ export function SubmitScoresButton({
           href={`https://basescan.org/tx/${txHash}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center justify-center gap-1 text-sm text-black hover:underline transition-none"
         >
           View on BaseScan
-          <ExternalLink className="h-3 w-3" />
+          <ExternalLink className="h-4 w-4" />
         </a>
       )}
     </div>

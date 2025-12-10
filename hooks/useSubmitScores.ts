@@ -77,13 +77,14 @@ export function useSubmitScores() {
       // 4. Build payload
       interface BreakdownItem {
         provider: string;
+        rawScore: number | null;
         normalizedScore: number;
       }
       const payload: ScorePayload = {
         user: address,
         ssaIndex: Math.round(scoresData.data.ssaIndex.score),
         providers: scoresData.data.ssaIndex.breakdown.map((b: BreakdownItem) => PROVIDER_ID_MAP[b.provider]),
-        scores: scoresData.data.ssaIndex.breakdown.map((b: BreakdownItem) => Math.round(b.normalizedScore)),
+        scores: scoresData.data.ssaIndex.breakdown.map((b: BreakdownItem) => Math.round(b.rawScore ?? 0)),
         timestamp: Math.floor(Date.now() / 1000),
       };
 
