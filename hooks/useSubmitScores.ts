@@ -80,11 +80,23 @@ export function useSubmitScores() {
         rawScore: number | null;
         normalizedScore: number;
       }
+
+      // Scale decimal providers (0-1) to integers (0-100)
+      const DECIMAL_SCALE = 100;
+      const DECIMAL_PROVIDERS = ['neynar', 'quotient'];
+
       const payload: ScorePayload = {
         user: address,
         ssaIndex: Math.round(scoresData.data.ssaIndex.score),
         providers: scoresData.data.ssaIndex.breakdown.map((b: BreakdownItem) => PROVIDER_ID_MAP[b.provider]),
-        scores: scoresData.data.ssaIndex.breakdown.map((b: BreakdownItem) => Math.round(b.rawScore ?? 0)),
+        scores: scoresData.data.ssaIndex.breakdown.map((b: BreakdownItem) => {
+          const raw = b.rawScore ?? 0;
+          // Scale decimal providers (0-1) to integers (0-100)
+          if (DECIMAL_PROVIDERS.includes(b.provider)) {
+            return Math.round(raw * DECIMAL_SCALE);
+          }
+          return Math.round(raw);
+        }),
         timestamp: Math.floor(Date.now() / 1000),
       };
 

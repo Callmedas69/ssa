@@ -26,7 +26,7 @@ contract SocialScoreAttestator is
     // ------------------------------------------------------------------------
 
     struct ProviderScore {
-        uint256 score;      // normalized score: 0-100
+        uint256 score;      // raw provider score: 0-MAX_SCORE
         uint256 updatedAt;  // unix timestamp (seconds)
     }
 
@@ -47,6 +47,9 @@ contract SocialScoreAttestator is
 
     /// @notice Minimum time between submissions per user (24 hours)
     uint256 public constant MIN_SUBMISSION_INTERVAL = 1 days;
+
+    /// @notice Maximum allowed provider score (raw scores)
+    uint256 public constant MAX_SCORE = 10000;
 
     /// @notice EIP-712 typehash for ScorePayload
     bytes32 public constant SCORE_PAYLOAD_TYPEHASH =
@@ -262,7 +265,7 @@ contract SocialScoreAttestator is
             if (!allowedProviders[providerId]) revert ProviderNotAllowed(providerId);
 
             uint256 score = payload.scores[i];
-            if (score > 100) revert ScoreTooHigh(score);
+            if (score > MAX_SCORE) revert ScoreTooHigh(score);
 
             providerScores[payload.user][providerId] = ProviderScore({
                 score: score,

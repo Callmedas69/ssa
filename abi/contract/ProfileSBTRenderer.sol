@@ -115,8 +115,9 @@ contract ProfileSBTRenderer is
             scoreAttestator
         );
 
-        // Generate SVG
-        string memory svg = _generateSVG(owner, tokenId, ssaIndex, scores);
+        // Generate both static and animated SVGs
+        string memory staticSvg = _generateSVG(owner, tokenId, ssaIndex, scores, false);
+        string memory animatedSvg = _generateSVG(owner, tokenId, ssaIndex, scores, true);
 
         // Build JSON metadata
         string memory json = string(
@@ -126,7 +127,10 @@ contract ProfileSBTRenderer is
                 '",',
                 '"description":"Social Score Attestation Profile - Soulbound Token",',
                 '"image":"data:image/svg+xml;base64,',
-                Base64.encode(bytes(svg)),
+                Base64.encode(bytes(staticSvg)),
+                '",',
+                '"animation_url":"data:image/svg+xml;base64,',
+                Base64.encode(bytes(animatedSvg)),
                 '"'
             )
         );
@@ -327,11 +331,13 @@ contract ProfileSBTRenderer is
     /// @param tokenId Used for color rotation per token
     /// @param ssaIndex Primary visual data (0-99, clamped)
     /// @param scores Not used in SVG (kept in metadata only)
+    /// @param animated If true, includes CSS animation; if false, static SVG
     function _generateSVG(
         address owner,
         uint256 tokenId,
         uint256 ssaIndex,
-        uint256[6] memory scores
+        uint256[6] memory scores,
+        bool animated
     ) internal pure returns (string memory) {
         // Silence unused variable warnings
         owner;
@@ -354,7 +360,7 @@ contract ProfileSBTRenderer is
             string(
                 abi.encodePacked(
                     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
-                    '<style>.d{animation:c 8s linear infinite}@keyframes c{to{filter:hue-rotate(360deg)}}</style>',
+                    animated ? '<style>.d{animation:c 8s linear infinite}@keyframes c{to{filter:hue-rotate(360deg)}}</style>' : '',
                     '<rect width="512" height="512" fill="#2e293a"/>',
                     _renderBrailleDigit(leftPattern, 64, tokenId, 0),
                     _renderBrailleDigit(rightPattern, 266, tokenId, 1),
@@ -465,19 +471,19 @@ contract ProfileSBTRenderer is
                     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
                     '<rect width="100%" height="100%" fill="#fff"/>',
                     // LEFT SET
-                    '<circle cx="104" cy="154" r="40" fill="none" />',
-                    '<circle cx="104" cy="256" r="40" fill="none" />',
-                    '<circle cx="104" cy="357" r="40" fill="#000" />',
-                    '<circle cx="205" cy="154" r="40" fill="#000" />',
-                    '<circle cx="205" cy="256" r="40" fill="#000" />',
-                    '<circle cx="205" cy="357" r="40" fill="#000" />',
+                    '<circle cx="104" cy="154" r="40" fill="none" stroke="#000" stroke-width="1"  />',
+                    '<circle cx="104" cy="256" r="40" fill="none" stroke="#000" stroke-width="1"  />',
+                    '<circle cx="104" cy="357" r="40" fill="#000" stroke="#000" stroke-width="4"  />',
+                    '<circle cx="205" cy="154" r="40" fill="#000" stroke="#000" stroke-width="4"  />',
+                    '<circle cx="205" cy="256" r="40" fill="#000" stroke="#000" stroke-width="4"  />',
+                    '<circle cx="205" cy="357" r="40" fill="#000" stroke="#000" stroke-width="4"  />',
                     // RIGHT SET
-                    '<circle cx="307" cy="154" r="40" fill="#fc401f" />',
-                    '<circle cx="307" cy="256" r="40" fill="#0000ff" />',
-                    '<circle cx="307" cy="357" r="40" fill="none" />',
-                    '<circle cx="408" cy="154" r="40" fill="none" />',
-                    '<circle cx="408" cy="256" r="40" fill="#ffd12f" />',
-                    '<circle cx="408" cy="357" r="40" fill="none" />',
+                    '<circle cx="307" cy="154" r="40" fill="#f15bb5" stroke="#f15bb5" stroke-width="8" />',
+                    '<circle cx="307" cy="256" r="40" fill="#00f5d4" stroke="#00f5d4" stroke-width="8" />',
+                    '<circle cx="307" cy="357" r="40" fill="none" stroke="#000" stroke-width="1"  />',
+                    '<circle cx="408" cy="154" r="40" fill="none" stroke="#000" stroke-width="1"  />',
+                    '<circle cx="408" cy="256" r="40" fill="#fee440" stroke="#fee440" stroke-width="8" />',
+                    '<circle cx="408" cy="357" r="40" fill="none" stroke="#000" stroke-width="1"  />',
                     "</svg>"
                 )
             );

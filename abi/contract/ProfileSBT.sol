@@ -74,6 +74,11 @@ contract ProfileSBT is
     /// @dev If 0, no maximum lifetime is enforced
     uint256 public maxVoucherLifetime;
 
+    /// @notice Storage gap for future upgrades
+    /// @dev Reserve 50 slots for future storage variables.
+    /// When adding new storage variables, reduce this gap accordingly.
+    uint256[50] private __gap;
+
     // ------------------------------------------------------------------------
     // Events
     // ------------------------------------------------------------------------

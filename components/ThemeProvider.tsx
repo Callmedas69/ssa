@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect } from "react";
 
-type Theme = "mac1";
+type Theme = "mac1" | "retro";
 
 interface ThemeContextType {
   theme: Theme;
@@ -11,7 +11,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme: Theme = "mac1";
+  const theme: Theme = "retro";
 
   useEffect(() => {
     // Set data attribute on mount

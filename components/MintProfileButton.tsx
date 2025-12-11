@@ -67,7 +67,7 @@ export function MintProfileButton({
       return (
         <span className="flex items-center justify-center gap-2">
           <Check className="h-4 w-4" />
-          Minted
+          MINTED
         </span>
       );
     }
@@ -77,7 +77,7 @@ export function MintProfileButton({
         return (
           <span className="flex items-center justify-center gap-2">
             <Award className="h-4 w-4" />
-            Mint
+            MINT BADGE
           </span>
         );
       case "checking":
@@ -113,18 +113,18 @@ export function MintProfileButton({
         return (
           <span className="flex items-center justify-center gap-2">
             <Check className="h-4 w-4" />
-            Minted!
+            MINTED!
           </span>
         );
       case "error":
         return (
           <span className="flex items-center justify-center gap-2">
             <AlertCircle className="h-4 w-4" />
-            Try Again
+            TRY AGAIN
           </span>
         );
       default:
-        return "Mint Profile NFT";
+        return "MINT BADGE";
     }
   };
 
@@ -143,14 +143,14 @@ export function MintProfileButton({
         disabled={isDisabled}
         variant={
           state === "success" || (hasMinted && state === "idle")
-            ? "secondary"
+            ? "retro-success"
             : state === "error"
-            ? "destructive"
-            : "default"
+            ? "retro-outline"
+            : "retro-outline"
         }
         className="w-full flex justify-center flex-row items-center"
         aria-label={
-          hasMinted ? "Profile NFT already minted" : "Mint Profile NFT"
+          hasMinted ? "Profile badge already minted" : "Mint Profile Badge"
         }
         aria-busy={isLoading}
         aria-disabled={isDisabled}
@@ -160,18 +160,18 @@ export function MintProfileButton({
 
       {/* Error message */}
       {error && (
-        <div className="space-y-1">
-          <p className="text-sm text-destructive text-center font-medium">
+        <div className="space-y-1 bg-white p-3 border-2 border-[#2D2A26] rounded-lg">
+          <p className="text-sm text-[#C53030] text-center font-bold">
             {error}
           </p>
           {error.includes("already minted") && (
-            <p className="text-xs text-muted-foreground text-center">
-              You already have a Profile NFT.
+            <p className="text-xs text-[#8B8680] text-center">
+              You already have a Profile Badge.
             </p>
           )}
           {error.includes("voucher") && (
-            <p className="text-xs text-muted-foreground text-center">
-              There was an issue generating your mint voucher. Please try again.
+            <p className="text-xs text-[#8B8680] text-center">
+              Issue generating your badge. Please try again.
             </p>
           )}
         </div>
@@ -183,7 +183,7 @@ export function MintProfileButton({
           href={`https://basescan.org/tx/${txHash}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="flex items-center justify-center gap-1 text-sm text-[#E85D3B] font-bold hover:underline"
         >
           View on BaseScan
           <ExternalLink className="h-3 w-3" />
@@ -191,14 +191,14 @@ export function MintProfileButton({
       )}
 
       {hasMinted && state === "idle" && (
-        <p className="text-xs text-center text-muted-foreground">
-          Your Profile NFT is already minted
+        <p className="text-xs text-center text-[#8B8680]">
+          Your badge is already minted!
         </p>
       )}
 
       {!hasAttested && !hasMinted && (
-        <p className="text-xs text-center text-muted-foreground">
-          Please attest your scores first
+        <p className="text-xs text-center text-[#8B8680]">
+          Verify your scores first
         </p>
       )}
     </div>

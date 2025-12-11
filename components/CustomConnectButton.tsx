@@ -36,6 +36,10 @@ export function CustomConnectButton() {
             })}
           >
             {(() => {
+              // Retro theme classes
+              const retroButton = "retro-button min-h-11 text-sm";
+              const retroButtonOutline = "bg-[#F5F0E8] text-[#2D2A26] border-2 border-[#2D2A26] rounded-lg px-4 py-2 font-bold uppercase tracking-wide shadow-[3px_3px_0_#2D2A26] hover:bg-[#E85D3B] hover:text-white hover:translate-y-[-2px] hover:shadow-[5px_5px_0_#2D2A26] transition-all duration-150 min-h-11 text-sm";
+
               if (!connected) {
                 return (
                   <button
@@ -44,11 +48,13 @@ export function CustomConnectButton() {
                     className={
                       theme === "mac1"
                         ? "mac1-button min-h-11"
+                        : theme === "retro"
+                        ? retroButton
                         : "rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 min-h-11"
                     }
                     aria-label="Connect cryptocurrency wallet"
                   >
-                    Connect Wallet
+                    CONNECT
                   </button>
                 );
               }
@@ -61,10 +67,12 @@ export function CustomConnectButton() {
                     className={
                       theme === "mac1"
                         ? "mac1-button min-h-11"
+                        : theme === "retro"
+                        ? "bg-[#C53030] text-white border-2 border-[#2D2A26] rounded-lg px-4 py-2 font-bold uppercase tracking-wide shadow-[3px_3px_0_#2D2A26] min-h-11 text-sm"
                         : "rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 min-h-11"
                     }
                   >
-                    Wrong network
+                    WRONG NETWORK
                   </button>
                 );
               }
@@ -76,49 +84,16 @@ export function CustomConnectButton() {
                   className={
                     theme === "mac1"
                       ? "mac1-button-icon min-h-11 min-w-11 flex items-center justify-center sm:mac1-button sm:min-h-0 sm:min-w-0"
+                      : theme === "retro"
+                      ? `${retroButtonOutline} flex items-center justify-center`
                       : "rounded-xl bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 min-h-11"
                   }
                 >
                   <span className="hidden sm:inline">
                     {account.displayName}
-                    {account.displayBalance
-                      ? ` (${account.displayBalance})`
-                      : ""}
                   </span>
                   <span className="sm:hidden">
-                    <svg
-                      width="32"
-                      height="32"
-                      viewBox="0 0 64 64"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M52 2H10V4H8V54H10V62H52V54H54V4H52V2Z"
-                        fill="white"
-                      />
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M52 0H10V2H8V4H6V54H8V64H54V54H56V4H54V2H52V0ZM52 2V4H54V54H8V4H10V2H52ZM52 62H10V56H52V62Z"
-                        fill="black"
-                      />
-                      <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M48 6H14V8H12V34H14V36H48V34H50V8H48V6ZM48 8V34H14V8H48Z"
-                        fill="black"
-                      />
-                      <path
-                        d="M26 26H24V28H26V30H34V28H36V26H34V28H26V26Z"
-                        fill="black"
-                      />
-                      <path d="M32 14H30V22H28V24H32V14Z" fill="black" />
-                      <rect x="38" y="14" width="2" height="4" fill="black" />
-                      <rect x="22" y="14" width="2" height="4" fill="black" />
-                      <rect x="12" y="44" width="4" height="2" fill="black" />
-                      <rect x="37" y="44" width="12" height="2" fill="black" />
-                    </svg>
+                    {account.displayName?.slice(0, 6)}...
                   </span>
                 </button>
               );

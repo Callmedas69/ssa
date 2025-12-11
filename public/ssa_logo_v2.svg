@@ -18,15 +18,15 @@
 
     <!-- RIGHT SET -->
     <!-- Matrix 1 -->
-    <circle cx="307" cy="154" r="40" fill="#fc401f" stroke="#fc401f" stroke-width="8" />
+    <circle cx="307" cy="154" r="40" fill="#f15bb5" stroke="#f15bb5" stroke-width="8" />
     <!-- Matrix 2 -->
-    <circle cx="307" cy="256" r="40" fill="#0000ff" stroke="#0000ff" stroke-width="8" />
+    <circle cx="307" cy="256" r="40" fill="#00f5d4" stroke="#00f5d4" stroke-width="8" />
     <!-- Matrix 3 -->
     <circle cx="307" cy="357" r="40" fill="none" stroke="#000" stroke-width="1" />
     <!-- Matrix 4 -->
     <circle cx="408" cy="154" r="40" fill="none" stroke="#000" stroke-width="1" />
     <!-- Matrix 5 -->
-    <circle cx="408" cy="256" r="40" fill="#ffd12f" stroke="#ffd12f" stroke-width="8" />
+    <circle cx="408" cy="256" r="40" fill="#fee440" stroke="#fee440" stroke-width="8" />
     <!-- Matrix 6 -->
     <circle cx="408" cy="357" r="40" fill="none" stroke="#000" stroke-width="1" />
 </svg>

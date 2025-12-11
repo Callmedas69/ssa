@@ -32,7 +32,7 @@ export function SubmitScoresButton({
   const getButtonContent = () => {
     switch (state) {
       case "idle":
-        return hasMinted ? "Update" : "Attest";
+        return hasMinted ? "UPDATE SCORE" : "VERIFY NOW";
       case "signing":
         return (
           <span className="flex flex-row items-center justify-center">
@@ -45,7 +45,7 @@ export function SubmitScoresButton({
         return (
           <span className="flex flex-row items-center justify-center">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Submitting...
+            Sending...
           </span>
         );
       case "confirming":
@@ -59,25 +59,25 @@ export function SubmitScoresButton({
         return (
           <span className="flex flex-row items-center justify-center">
             <Check className="mr-2 h-4 w-4" />
-            Attested!
+            VERIFIED!
           </span>
         );
       case "error":
         return (
           <span className="flex flex-row items-center justify-center">
             <AlertCircle className="mr-2 h-4 w-4" />
-            Try Again
+            TRY AGAIN
           </span>
         );
       case "cooldown":
         return (
           <span className="flex flex-row items-center justify-center">
             <AlertCircle className="mr-2 h-4 w-4" />
-            Cooldown
+            WAIT 24H
           </span>
         );
       default:
-        return "Attest On-Chain";
+        return "VERIFY NOW";
     }
   };
 
@@ -93,18 +93,18 @@ export function SubmitScoresButton({
         disabled={isDisabled}
         variant={
           state === "success"
-            ? "secondary"
+            ? "retro-success"
             : state === "error"
-            ? "destructive"
+            ? "retro-outline"
             : state === "cooldown"
-            ? "secondary"
-            : "default"
+            ? "retro-outline"
+            : "retro"
         }
         className="w-full min-w-[140px] flex-1 flex items-center justify-center"
         aria-label={
           hasMinted
             ? "Update social scores on-chain"
-            : "Attest social scores on-chain"
+            : "Verify social scores on-chain"
         }
         aria-busy={isLoading}
         aria-disabled={isDisabled}
@@ -112,33 +112,31 @@ export function SubmitScoresButton({
         {getButtonContent()}
       </Button>
 
-      {/* Error message with better formatting */}
+      {/* Error message */}
       {error && (
         <div
-          className="space-y-2 mac1-inset bg-white p-2 border-2 border-black"
+          className="space-y-2 bg-white p-3 border-2 border-[#2D2A26] rounded-lg"
           role="alert"
           aria-live="assertive"
         >
-          <p className="text-sm text-black text-center font-bold">
-            ⚠️{" "}
+          <p className="text-sm text-[#2D2A26] text-center font-bold">
             {error.includes("No signed payload")
-              ? "Failed to prepare attestation. Please try again."
+              ? "Failed to prepare. Please try again."
               : error}
           </p>
           {error.toLowerCase().includes("provider") && (
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-xs text-[#8B8680] text-center">
               Please try again. If the issue persists, contact support.
             </p>
           )}
           {error.includes("paused") && (
-            <p className="text-xs text-muted-foreground text-center">
-              The contract is temporarily paused. Please check back later.
+            <p className="text-xs text-[#8B8680] text-center">
+              The contract is temporarily paused. Check back later.
             </p>
           )}
           {error.includes("24 hours") && (
-            <p className="text-xs text-muted-foreground text-center">
-              You can only submit scores once per day. Please wait before trying
-              again.
+            <p className="text-xs text-[#8B8680] text-center">
+              Check back tomorrow!
             </p>
           )}
         </div>
@@ -150,7 +148,7 @@ export function SubmitScoresButton({
           href={`https://basescan.org/tx/${txHash}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-1 text-sm text-black hover:underline transition-none"
+          className="flex items-center justify-center gap-1 text-sm text-[#E85D3B] font-bold hover:underline"
         >
           View on BaseScan
           <ExternalLink className="h-4 w-4" />

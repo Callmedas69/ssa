@@ -93,33 +93,41 @@ export const ProviderGuidance = memo(function ProviderGuidance({
   const guidance = guidanceData[provider];
 
   return (
-    <div className="mac1-window bg-white p-1">
+    <div className="bg-[#F5F0E8] border border-[#2D2A26]/30 rounded-lg overflow-hidden">
       <button
         onClick={onToggle}
-        className="mac1-title-bar w-full cursor-pointer hover:bg-[#E8E8E8] transition-colors"
+        className="w-full px-3 py-2 cursor-pointer hover:bg-[#E8E3DB] transition-colors"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[11px]">{isExpanded ? "▼" : "▶"}</span>
-            <h4 className="uppercase text-[11px]">{guidance.name}</h4>
+            <span
+              className={`text-sm font-bold text-[#2D2A26] transition-transform duration-300 ease-out ${
+                isExpanded ? "rotate-90" : "rotate-0"
+              }`}
+            >
+              ▶
+            </span>
+            <h4 className="uppercase text-sm font-bold text-[#2D2A26] tracking-wide">
+              {guidance.name}
+            </h4>
           </div>
           <a
             href={guidance.link}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="text-[11px] text-black hover:underline flex items-center gap-1"
+            className="text-[10px] italic text-[#E85D3B] font-bold hover:underline flex items-center gap-1"
           >
             {guidance.linkText}
             <svg
-              className="w-2 h-2"
+              className="w-3 h-3"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap="square"
-                strokeLinejoin="miter"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth={2}
                 d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
               />
@@ -128,27 +136,33 @@ export const ProviderGuidance = memo(function ProviderGuidance({
         </div>
       </button>
 
-      {isExpanded && (
-        <div className="mac1-inset bg-white p-3 mt-2">
-          {!hasProfile && (
-            <p className="text-[11px] text-black mb-3 font-bold">
-              ⚠️ No profile found. Create one to start building your reputation.
-            </p>
-          )}
+      <div
+        className={`grid transition-all duration-300 ease-out ${
+          isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="px-3 py-2 bg-white/50 border-t border-[#2D2A26]/20">
+            {!hasProfile && (
+              <p className="text-sm text-[#C53030] mb-3 font-bold">
+                No profile found. Create one to start building your reputation.
+              </p>
+            )}
 
-          <ul className="space-y-1">
-            {guidance.tips.map((tip, index) => (
-              <li
-                key={index}
-                className="text-[11px] text-black flex items-start gap-2"
-              >
-                <span className="mt-0.5">•</span>
-                <span>{tip}</span>
-              </li>
-            ))}
-          </ul>
+            <ul className="space-y-2">
+              {guidance.tips.map((tip, index) => (
+                <li
+                  key={index}
+                  className="text-sm text-[#2D2A26] flex items-start gap-2"
+                >
+                  <span className="text-[#E85D3B] mt-0.5">•</span>
+                  <span>{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 });
@@ -168,7 +182,7 @@ export const AllProviderGuidance = memo(function AllProviderGuidance({
   scores,
 }: AllGuidanceProps) {
   const [expandedProvider, setExpandedProvider] =
-    useState<ScoreProvider | null>("neynar");
+    useState<ScoreProvider | null>(null);
 
   const providers: ScoreProvider[] = [
     "neynar",
@@ -180,12 +194,8 @@ export const AllProviderGuidance = memo(function AllProviderGuidance({
   ];
 
   return (
-    <div className="mac1-window bg-white p-1 max-w-2xl w-full">
-      <div className="mac1-title-bar mb-2">
-        <h3 className="uppercase text-[11px]">
-          How to Improve Your Scores (Click to expand)
-        </h3>
-      </div>
+    <div className="w-full">
+      
       <div className="space-y-2">
         {providers.map((provider) => (
           <ProviderGuidance

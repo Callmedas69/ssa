@@ -110,6 +110,37 @@
   --ring: #000000;
 }
 
+/* Retro Poster Theme */
+[data-theme="retro"] {
+  --radius: 0.5rem;
+  --background: #F5F0E8;
+  --foreground: #2D2A26;
+  --card: #FFFFFF;
+  --card-foreground: #2D2A26;
+  --popover: #FFFFFF;
+  --popover-foreground: #2D2A26;
+  --primary: #E85D3B;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4A261;
+  --secondary-foreground: #2D2A26;
+  --muted: #E8E3DB;
+  --muted-foreground: #8B8680;
+  --accent: #E9C46A;
+  --accent-foreground: #2D2A26;
+  --destructive: #C53030;
+  --border: #2D2A26;
+  --input: #FFFFFF;
+  --ring: #E85D3B;
+
+  /* Retro-specific colors */
+  --retro-coral: #E85D3B;
+  --retro-orange: #F4A261;
+  --retro-gold: #E9C46A;
+  --retro-teal: #2A9D8F;
+  --retro-cream: #F5F0E8;
+  --retro-brown: #2D2A26;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -252,4 +283,162 @@
 .mac1-button-icon:focus-visible {
   outline: 2px solid #000000;
   outline-offset: 2px;
+}
+
+/* ============================================
+   RETRO POSTER THEME STYLES
+   ============================================ */
+
+/* Retro Card - White with dark border and hard shadow */
+.retro-card {
+  background: #FFFFFF;
+  border: 2px solid #2D2A26;
+  border-radius: 0.5rem;
+  box-shadow: 4px 4px 0 #2D2A26;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.retro-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #2D2A26;
+}
+
+/* Retro Badge - Circular seal style */
+.retro-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #2D2A26;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  box-shadow: 3px 3px 0 #2D2A26;
+}
+
+/* 3D Text Effect */
+.retro-text-3d {
+  text-shadow:
+    2px 2px 0 #F4A261,
+    4px 4px 0 #E85D3B;
+}
+
+.retro-text-3d-sm {
+  text-shadow:
+    1px 1px 0 #F4A261,
+    2px 2px 0 #E85D3B;
+}
+
+/* Retro Button Base */
+.retro-button {
+  background: #E85D3B;
+  color: #FFFFFF;
+  border: 2px solid #2D2A26;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  box-shadow: 3px 3px 0 #2D2A26;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  cursor: pointer;
+}
+
+.retro-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 #2D2A26;
+}
+
+.retro-button:active {
+  transform: translateY(0);
+  box-shadow: 2px 2px 0 #2D2A26;
+}
+
+.retro-button:disabled {
+  background: #8B8680;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 2px 2px 0 #2D2A26;
+}
+
+/* Retro Button Outline */
+.retro-button-outline {
+  background: #F5F0E8;
+  color: #2D2A26;
+  border: 2px solid #2D2A26;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  box-shadow: 3px 3px 0 #2D2A26;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  cursor: pointer;
+}
+
+.retro-button-outline:hover {
+  background: #E85D3B;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 #2D2A26;
+}
+
+/* Retro Progress Bar */
+.retro-progress {
+  background: #E8E3DB;
+  border: 2px solid #2D2A26;
+  border-radius: 0.25rem;
+  height: 1.25rem;
+  overflow: hidden;
+}
+
+.retro-progress-fill {
+  background: linear-gradient(90deg, #E85D3B, #F4A261);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* Retro Section Divider */
+.retro-divider {
+  border: none;
+  border-top: 2px solid #2D2A26;
+  margin: 2rem 0;
+}
+
+/* Retro Focus State */
+[data-theme="retro"] *:focus-visible {
+  outline: 3px solid #E85D3B !important;
+  outline-offset: 2px !important;
+}
+
+/* Retro font override */
+[data-theme="retro"] body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================
+   WIZARD FLOW STYLES
+   ============================================ */
+
+/* Wizard Step Indicators */
+.wizard-step-indicator {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.wizard-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  border: 2px solid #2D2A26;
+  background: #E8E3DB;
+  transition: background 0.2s ease;
+}
+
+.wizard-dot.active {
+  background: #E85D3B;
+}
+
+.wizard-dot.completed {
+  background: #2A9D8F;
 }
