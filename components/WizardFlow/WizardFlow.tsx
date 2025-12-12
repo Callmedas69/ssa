@@ -6,12 +6,12 @@ import { useAccount } from "wagmi";
 import { WizardStep } from "./WizardStep";
 import { LandingStep } from "./steps/LandingStep";
 import { WelcomeStep } from "./steps/WelcomeStep";
-import { ScoresStep } from "./steps/ScoresStep";
+import { SSAIndexStep } from "./steps/SSAIndexStep";
+import { ProviderStep } from "./steps/ProviderStep";
 import { MintStep } from "./steps/MintStep";
 import { TipsStep } from "./steps/TipsStep";
 import { ShareStep } from "./steps/ShareStep";
 import { useHasMintedSBT } from "@/hooks/useHasMintedSBT";
-import { Badge } from "@/components/ui/badge";
 import type { SocialScores, ScoreApiResponse } from "@/lib/types";
 
 async function fetchScores(address: string): Promise<SocialScores> {
@@ -74,7 +74,7 @@ export function WizardFlow() {
   }, []);
 
   const goToNext = useCallback(() => {
-    if (currentStep < 6 && !isAnimating) {
+    if (currentStep < 7 && !isAnimating) {
       setIsAnimating(true);
       setDirection("forward");
       setCurrentStep((prev) => prev + 1);
@@ -103,12 +103,14 @@ export function WizardFlow() {
       case 2:
         return false; // Welcome step - always enabled
       case 3:
-        return isLoading || !!error; // Scores step
+        return isLoading || !!error; // SSA Index step
       case 4:
-        return false; // Mint step
+        return false; // Provider step
       case 5:
-        return false; // Tips step
+        return false; // Mint step
       case 6:
+        return false; // Tips step
+      case 7:
         return false; // Share step - Start Over enabled
       default:
         return false;
@@ -121,14 +123,16 @@ export function WizardFlow() {
       case 1:
         return isConnected ? "Get Started" : "Connect First";
       case 2:
-        return "View Scores";
+        return "View Score";
       case 3:
-        return "Verify & Mint";
+        return "Breakdown";
       case 4:
-        return "Tips";
+        return "Verify & Mint";
       case 5:
-        return "Share";
+        return "Tips";
       case 6:
+        return "Share";
+      case 7:
         return "Done";
       default:
         return "Next";
@@ -139,9 +143,9 @@ export function WizardFlow() {
     <div className="min-h-screen flex items-start sm:items-center justify-center py-0 px-0 sm:py-8 sm:px-4">
       {/* Container - responsive width */}
       <div className="relative w-full sm:w-[85%] lg:w-[75%] sm:max-w-4xl">
-        {/* Card for steps 1-6 */}
-        {currentStep <= 6 && (
-          <div className="min-h-screen sm:min-h-0 sm:h-[80vh] bg-[#F5F0E8] py-6 px-8 sm:py-6 sm:px-10 lg:py-8 lg:px-12 pb-24 sm:pb-20 overflow-y-auto sm:overflow-hidden border-0 sm:border-2 border-[#2D2A26] rounded-none sm:rounded-lg shadow-none sm:shadow-[4px_4px_0_#2D2A26] flex flex-col justify-start sm:justify-center">
+        {/* Card for steps 1-7 */}
+        {currentStep <= 7 && (
+          <div className="min-h-screen sm:min-h-0 sm:h-[80vh] bg-[#F5F0E8] py-6 px-8 sm:py-6 sm:px-10 lg:py-8 lg:px-12 pb-24 sm:pb-20 overflow-y-auto sm:overflow-hidden border-0 sm:border-2 border-[#2D2A26] rounded-none sm:rounded-lg shadow-none sm:shadow-[4px_4px_0_#2D2A26] flex flex-col justify-center">
             {/* Step 1: Landing - Logo + Title + Tagline + Connect */}
             <WizardStep
               stepNumber={1}
@@ -162,23 +166,36 @@ export function WizardFlow() {
               <WelcomeStep />
             </WizardStep>
 
-            {/* Step 3: Scores */}
+            {/* Step 3: SSA Index */}
             <WizardStep
               stepNumber={3}
               currentStep={currentStep}
               direction={direction}
               onAnimationComplete={handleAnimationComplete}
             >
-              <ScoresStep
+              <SSAIndexStep
                 scores={scores}
                 isLoading={isLoading}
                 error={error as Error | null}
               />
             </WizardStep>
 
-            {/* Step 4: Mint */}
+            {/* Step 4: Provider Breakdown */}
             <WizardStep
               stepNumber={4}
+              currentStep={currentStep}
+              direction={direction}
+              onAnimationComplete={handleAnimationComplete}
+            >
+              <ProviderStep
+                scores={scores}
+                isLoading={isLoading}
+              />
+            </WizardStep>
+
+            {/* Step 5: Mint */}
+            <WizardStep
+              stepNumber={5}
               currentStep={currentStep}
               direction={direction}
               onAnimationComplete={handleAnimationComplete}
@@ -194,9 +211,9 @@ export function WizardFlow() {
               )}
             </WizardStep>
 
-            {/* Step 5: Tips */}
+            {/* Step 6: Tips */}
             <WizardStep
-              stepNumber={5}
+              stepNumber={6}
               currentStep={currentStep}
               direction={direction}
               onAnimationComplete={handleAnimationComplete}
@@ -204,9 +221,9 @@ export function WizardFlow() {
               <TipsStep scores={scores} />
             </WizardStep>
 
-            {/* Step 6: Share */}
+            {/* Step 7: Share */}
             <WizardStep
-              stepNumber={6}
+              stepNumber={7}
               currentStep={currentStep}
               direction={direction}
               onAnimationComplete={handleAnimationComplete}
@@ -220,15 +237,6 @@ export function WizardFlow() {
         {/* Hide navigation on step 1 (Landing) until connected */}
         {(currentStep > 1 || isConnected) && (
           <div className="fixed sm:absolute left-0 right-0 z-50 sm:z-10 bg-[#F5F0E8] sm:bg-transparent bottom-0 sm:translate-y-1/2">
-            {/* Index Tiers - only on step 3 */}
-            {currentStep === 3 && scores?.ssaIndex && (
-              <div className="flex justify-center gap-1.5 py-2 px-2 sm:hidden flex-wrap">
-                <Badge variant="retro" className="bg-[#8B8680] text-white border-[#2D2A26]">0-24 Newcomer</Badge>
-                <Badge variant="retro" className="bg-[#E85D3B] text-white border-[#2D2A26]">25-49 Rising</Badge>
-                <Badge variant="retro" className="bg-[#F4A261] text-white border-[#2D2A26]">50-74 Trusted</Badge>
-                <Badge variant="retro" className="bg-[#2A9D8F] text-white border-[#2D2A26]">75+ Legend</Badge>
-              </div>
-            )}
             {/* Nav buttons */}
             <div className="flex justify-between items-center w-full px-4 py-3 sm:py-0 border-t-2 sm:border-0 border-[#2D2A26]">
               {/* Back Button - Left */}
@@ -249,7 +257,7 @@ export function WizardFlow() {
 
               {/* Step Indicator Dots - Mobile only */}
               <div className="flex sm:hidden items-center gap-1.5">
-                {[1, 2, 3, 4, 5, 6].map((step) => (
+                {[1, 2, 3, 4, 5, 6, 7].map((step) => (
                   <div
                     key={step}
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
@@ -266,12 +274,12 @@ export function WizardFlow() {
               {/* Next Button - Right */}
               <div>
                 <button
-                  onClick={currentStep === 6 ? handleStartOver : goToNext}
+                  onClick={currentStep === 7 ? handleStartOver : goToNext}
                   disabled={getNextDisabled() || isAnimating}
                   className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 bg-[#E85D3B] text-white font-bold uppercase tracking-wide text-xs sm:text-sm rounded-lg border-2 border-[#2D2A26] shadow-[2px_2px_0_#2D2A26] sm:shadow-[3px_3px_0_#2D2A26] hover:translate-y-[-2px] hover:shadow-[4px_4px_0_#2D2A26] sm:hover:shadow-[5px_5px_0_#2D2A26] transition-all duration-150 disabled:cursor-not-allowed"
                 >
-                  {currentStep === 6 ? "Start Over" : getNextLabel()}
-                  {currentStep !== 6 && (
+                  {currentStep === 7 ? "Start Over" : getNextLabel()}
+                  {currentStep !== 7 && (
                     <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

@@ -6,14 +6,15 @@ import { SubmitScoresButton } from "./SubmitScoresButton";
 import { MintProfileButton } from "./MintProfileButton";
 import { CountdownTimer } from "./CountdownTimer";
 import { useSubmitScores } from "@/hooks/useSubmitScores";
-import type { UserIdentity } from "@/lib/types";
+import type { UserIdentity, SSAIndexTier } from "@/lib/types";
+import { TIER_LABELS } from "@/lib/ssaIndex";
 import { useTheme } from "./ThemeProvider";
 
 interface OnchainProfileCardProps {
   address: string;
   identity: UserIdentity | null;
   ssaIndex: number | null;
-  ssaTier?: string | null;
+  ssaTier?: SSAIndexTier | null;
   hasMintedSBT?: boolean;
 }
 
@@ -92,10 +93,7 @@ export function OnchainProfileCard({
                   </span>
                   {ssaTier && (
                     <span className="text-xs font-bold text-[#E85D3B] uppercase">
-                      {ssaTier === "bronze" && "NEWCOMER"}
-                      {ssaTier === "silver" && "RISING"}
-                      {ssaTier === "gold" && "TRUSTED"}
-                      {ssaTier === "platinum" && "LEGEND"}
+                      {TIER_LABELS[ssaTier]}
                     </span>
                   )}
                 </div>

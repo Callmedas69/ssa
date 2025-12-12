@@ -1,12 +1,20 @@
 import { providerRegistry, normalizeScore, type ProviderResult } from './providers';
 import type { SSAIndex, SSAIndexTier, SSAIndexBreakdown } from './types';
 
-// Tier thresholds
-const TIERS = {
+// Tier thresholds - single source of truth
+export const TIERS = {
   platinum: { min: 90, max: 100 },
   gold: { min: 70, max: 89 },
   silver: { min: 40, max: 69 },
   bronze: { min: 0, max: 39 },
+} as const;
+
+// Tier display labels
+export const TIER_LABELS: Record<SSAIndexTier, string> = {
+  bronze: "NEWCOMER",
+  silver: "RISING STAR",
+  gold: "TRUSTED",
+  platinum: "LEGENDARY",
 } as const;
 
 /**

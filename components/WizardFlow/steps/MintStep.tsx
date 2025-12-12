@@ -1,13 +1,13 @@
 "use client";
 
 import { OnchainProfileCard } from "@/components/OnchainProfileCard";
-import type { UserIdentity } from "@/lib/types";
+import type { UserIdentity, SSAIndexTier } from "@/lib/types";
 
 interface MintStepProps {
   address: `0x${string}`;
   identity: UserIdentity | null;
   ssaIndex: number | null;
-  ssaTier?: string | null;
+  ssaTier?: SSAIndexTier | null;
   hasMintedSBT?: boolean;
 }
 

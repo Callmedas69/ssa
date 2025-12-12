@@ -242,165 +242,147 @@ export function ScoresDashboard() {
           </h3>
           <div className="space-y-3">
             {/* Neynar */}
-            {scores.neynar && (
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/provider_logos/Neynar_400x400.jpg"
-                  alt="Neynar"
-                  width={24}
-                  height={24}
-                  className="rounded-full"
+            <div className="flex items-center gap-3">
+              <Image
+                src="/provider_logos/Neynar_400x400.jpg"
+                alt="Neynar"
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+              <span className="text-sm font-bold text-[#2D2A26] w-28">
+                Neynar
+              </span>
+              <span className={`text-sm font-mono w-14 text-right ${scores.neynar ? 'text-[#2D2A26]' : 'text-[#8B8680]'}`}>
+                {scores.neynar ? scores.neynar.score.toFixed(2) : '—'}
+              </span>
+              <div className="flex-1 retro-progress h-4">
+                <div
+                  className="retro-progress-fill"
+                  style={{ width: `${scores.neynar ? (scores.neynar.score / 1) * 100 : 0}%` }}
                 />
-                <span className="text-sm font-bold text-[#2D2A26] w-28">
-                  Neynar
-                </span>
-                <span className="text-sm text-[#2D2A26] font-mono w-14 text-right">
-                  {scores.neynar.score.toFixed(2)}
-                </span>
-                <div className="flex-1 retro-progress h-4">
-                  <div
-                    className="retro-progress-fill"
-                    style={{ width: `${(scores.neynar.score / 1) * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs text-[#8B8680] w-10 text-right">/ 1</span>
               </div>
-            )}
+              <span className="text-xs text-[#8B8680] w-10 text-right">/ 1</span>
+            </div>
             {/* Ethos */}
-            {scores.ethos && (
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/provider_logos/ethos_logo.png"
-                  alt="Ethos"
-                  width={24}
-                  height={24}
-                  className="rounded-full"
+            <div className="flex items-center gap-3">
+              <Image
+                src="/provider_logos/ethos_logo.png"
+                alt="Ethos"
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+              <span className="text-sm font-bold text-[#2D2A26] w-28">
+                Ethos
+              </span>
+              <span className={`text-sm font-mono w-14 text-right ${scores.ethos ? 'text-[#2D2A26]' : 'text-[#8B8680]'}`}>
+                {scores.ethos ? scores.ethos.score : '—'}
+              </span>
+              <div className="flex-1 retro-progress h-4">
+                <div
+                  className="retro-progress-fill"
+                  style={{ width: `${scores.ethos ? (scores.ethos.score / 2800) * 100 : 0}%` }}
                 />
-                <span className="text-sm font-bold text-[#2D2A26] w-28">
-                  Ethos
-                </span>
-                <span className="text-sm text-[#2D2A26] font-mono w-14 text-right">
-                  {scores.ethos.score}
-                </span>
-                <div className="flex-1 retro-progress h-4">
-                  <div
-                    className="retro-progress-fill"
-                    style={{ width: `${(scores.ethos.score / 2800) * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs text-[#8B8680] w-10 text-right">/ 2800</span>
               </div>
-            )}
+              <span className="text-xs text-[#8B8680] w-10 text-right">/ 2800</span>
+            </div>
             {/* Talent Builder */}
-            {scores.talentBuilder && (
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/provider_logos/Talent_Protocol.jpg"
-                  alt="Builder"
-                  width={24}
-                  height={24}
-                  className="rounded-full"
+            <div className="flex items-center gap-3">
+              <Image
+                src="/provider_logos/Talent_Protocol.jpg"
+                alt="Builder"
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+              <span className="text-sm font-bold text-[#2D2A26] w-28">
+                Builder
+              </span>
+              <span className={`text-sm font-mono w-14 text-right ${scores.talentBuilder ? 'text-[#2D2A26]' : 'text-[#8B8680]'}`}>
+                {scores.talentBuilder ? scores.talentBuilder.score : '—'}
+              </span>
+              <div className="flex-1 retro-progress h-4">
+                <div
+                  className="retro-progress-fill"
+                  style={{
+                    width: `${scores.talentBuilder ? Math.min((scores.talentBuilder.score / 1000) * 100, 100) : 0}%`,
+                  }}
                 />
-                <span className="text-sm font-bold text-[#2D2A26] w-28">
-                  Builder
-                </span>
-                <span className="text-sm text-[#2D2A26] font-mono w-14 text-right">
-                  {scores.talentBuilder.score}
-                </span>
-                <div className="flex-1 retro-progress h-4">
-                  <div
-                    className="retro-progress-fill"
-                    style={{
-                      width: `${Math.min(
-                        (scores.talentBuilder.score / 1000) * 100,
-                        100
-                      )}%`,
-                    }}
-                  />
-                </div>
-                <span className="text-xs text-[#8B8680] w-10 text-right">/ ∞</span>
               </div>
-            )}
+              <span className="text-xs text-[#8B8680] w-10 text-right">/ ∞</span>
+            </div>
             {/* Talent Creator */}
-            {scores.talentCreator && (
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/provider_logos/Talent_Protocol.jpg"
-                  alt="Creator"
-                  width={24}
-                  height={24}
-                  className="rounded-full"
+            <div className="flex items-center gap-3">
+              <Image
+                src="/provider_logos/Talent_Protocol.jpg"
+                alt="Creator"
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+              <span className="text-sm font-bold text-[#2D2A26] w-28">
+                Creator
+              </span>
+              <span className={`text-sm font-mono w-14 text-right ${scores.talentCreator ? 'text-[#2D2A26]' : 'text-[#8B8680]'}`}>
+                {scores.talentCreator ? scores.talentCreator.score : '—'}
+              </span>
+              <div className="flex-1 retro-progress h-4">
+                <div
+                  className="retro-progress-fill"
+                  style={{
+                    width: `${scores.talentCreator ? Math.min((scores.talentCreator.score / 1000) * 100, 100) : 0}%`,
+                  }}
                 />
-                <span className="text-sm font-bold text-[#2D2A26] w-28">
-                  Creator
-                </span>
-                <span className="text-sm text-[#2D2A26] font-mono w-14 text-right">
-                  {scores.talentCreator.score}
-                </span>
-                <div className="flex-1 retro-progress h-4">
-                  <div
-                    className="retro-progress-fill"
-                    style={{
-                      width: `${Math.min(
-                        (scores.talentCreator.score / 1000) * 100,
-                        100
-                      )}%`,
-                    }}
-                  />
-                </div>
-                <span className="text-xs text-[#8B8680] w-10 text-right">/ ∞</span>
               </div>
-            )}
+              <span className="text-xs text-[#8B8680] w-10 text-right">/ ∞</span>
+            </div>
             {/* Quotient */}
-            {scores.quotient && (
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/provider_logos/Quotient.png"
-                  alt="Quotient"
-                  width={24}
-                  height={24}
-                  className="rounded-full"
+            <div className="flex items-center gap-3">
+              <Image
+                src="/provider_logos/Quotient.png"
+                alt="Quotient"
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+              <span className="text-sm font-bold text-[#2D2A26] w-28">
+                Quotient
+              </span>
+              <span className={`text-sm font-mono w-14 text-right ${scores.quotient ? 'text-[#2D2A26]' : 'text-[#8B8680]'}`}>
+                {scores.quotient ? scores.quotient.score.toFixed(2) : '—'}
+              </span>
+              <div className="flex-1 retro-progress h-4">
+                <div
+                  className="retro-progress-fill"
+                  style={{ width: `${scores.quotient ? scores.quotient.score * 100 : 0}%` }}
                 />
-                <span className="text-sm font-bold text-[#2D2A26] w-28">
-                  Quotient
-                </span>
-                <span className="text-sm text-[#2D2A26] font-mono w-14 text-right">
-                  {scores.quotient.score.toFixed(2)}
-                </span>
-                <div className="flex-1 retro-progress h-4">
-                  <div
-                    className="retro-progress-fill"
-                    style={{ width: `${scores.quotient.score * 100}%` }}
-                  />
-                </div>
-                <span className="text-xs text-[#8B8680] w-10 text-right">/ 1</span>
               </div>
-            )}
+              <span className="text-xs text-[#8B8680] w-10 text-right">/ 1</span>
+            </div>
             {/* Passport */}
-            {scores.passport && (
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/provider_logos/human_paspport.png"
-                  alt="Passport"
-                  width={24}
-                  height={24}
-                  className="rounded-full"
+            <div className="flex items-center gap-3">
+              <Image
+                src="/provider_logos/human_paspport.png"
+                alt="Passport"
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+              <span className="text-sm font-bold text-[#2D2A26] w-28">
+                Passport
+              </span>
+              <span className={`text-sm font-mono w-14 text-right ${scores.passport ? 'text-[#2D2A26]' : 'text-[#8B8680]'}`}>
+                {scores.passport ? scores.passport.score.toFixed(2) : '—'}
+              </span>
+              <div className="flex-1 retro-progress h-4">
+                <div
+                  className="retro-progress-fill"
+                  style={{ width: `${scores.passport ? scores.passport.score : 0}%` }}
                 />
-                <span className="text-sm font-bold text-[#2D2A26] w-28">
-                  Passport
-                </span>
-                <span className="text-sm text-[#2D2A26] font-mono w-14 text-right">
-                  {scores.passport.score.toFixed(2)}
-                </span>
-                <div className="flex-1 retro-progress h-4">
-                  <div
-                    className="retro-progress-fill"
-                    style={{ width: `${scores.passport.score}%` }}
-                  />
-                </div>
-                <span className="text-xs text-[#8B8680] w-10 text-right">/ 100</span>
               </div>
-            )}
+              <span className="text-xs text-[#8B8680] w-10 text-right">/ 100</span>
+            </div>
           </div>
         </div>
       )}
