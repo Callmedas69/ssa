@@ -9,7 +9,7 @@ interface ShareStepProps {
 
 export function ShareStep({ scores }: ShareStepProps) {
   const [copied, setCopied] = useState(false);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ssaindex.xyz";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
 
   const tierLabels: Record<string, string> = {
     bronze: "NEWCOMER",

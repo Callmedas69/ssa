@@ -111,7 +111,7 @@ export function ScoresDashboard() {
                 gold: "TRUSTED",
                 platinum: "LEGENDARY",
               };
-              const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ssaindex.xyz";
+              const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
               const text = `My SSA Index is ${scores.ssaIndex?.score} - ${tierLabels[scores.ssaIndex?.tier || "bronze"]}! Check your onchain reputation score at`;
               window.open(
                 `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(appUrl)}`,
@@ -135,7 +135,7 @@ export function ScoresDashboard() {
                 gold: "TRUSTED",
                 platinum: "LEGENDARY",
               };
-              const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ssaindex.xyz";
+              const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
               const text = `My SSA Index is ${scores.ssaIndex?.score} - ${tierLabels[scores.ssaIndex?.tier || "bronze"]}! Check your onchain reputation score at ${appUrl}`;
               window.open(
                 `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}`,

@@ -18,7 +18,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { RainbowKitProviderWrapper } from "./rainbowkit-wrapper";
 import { FarcasterProvider } from "@/components/FarcasterProvider";
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ssaindex.xyz";
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
 
 // Farcaster Mini App embed configuration
 const farcasterFrame = {
