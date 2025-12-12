@@ -16,8 +16,25 @@ const ubuntu = Ubuntu({
 import { WagmiQueryProviders } from "./providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { RainbowKitProviderWrapper } from "./rainbowkit-wrapper";
+import { FarcasterProvider } from "@/components/FarcasterProvider";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://ssaindex.xyz";
+
+// Farcaster Mini App embed configuration
+const farcasterFrame = {
+  version: "1",
+  imageUrl: `${appUrl}/api/og`,
+  button: {
+    title: "Check Score",
+    action: {
+      type: "launch_frame",
+      name: "SSA Index",
+      url: appUrl,
+      splashImageUrl: `${appUrl}/splash.png`,
+      splashBackgroundColor: "#F5F0E8",
+    },
+  },
+};
 
 export const metadata: Metadata = {
   title: "SSA Index - Onchain Reputation Score",
@@ -46,6 +63,9 @@ export const metadata: Metadata = {
       "Your unified SSA Index from 6 reputation providers. Verified on Base.",
     images: [`${appUrl}/api/og`],
   },
+  other: {
+    "fc:miniapp": JSON.stringify(farcasterFrame),
+  },
 };
 
 export default function RootLayout({
@@ -57,11 +77,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`antialiased ${luckiestGuy.variable} ${ubuntu.className}`}>
         <WagmiQueryProviders>
-          <ThemeProvider>
-            <RainbowKitProviderWrapper>
-              {children}
-            </RainbowKitProviderWrapper>
-          </ThemeProvider>
+          <FarcasterProvider>
+            <ThemeProvider>
+              <RainbowKitProviderWrapper>
+                {children}
+              </RainbowKitProviderWrapper>
+            </ThemeProvider>
+          </FarcasterProvider>
         </WagmiQueryProviders>
       </body>
     </html>

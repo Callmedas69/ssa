@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { ProfileSBTDisplay } from "./ProfileSBTDisplay";
 import { SubmitScoresButton } from "./SubmitScoresButton";
 import { MintProfileButton } from "./MintProfileButton";
@@ -24,10 +25,18 @@ export function OnchainProfileCard({
   hasMintedSBT,
 }: OnchainProfileCardProps) {
   const { theme } = useTheme();
-  const { state: submitState, nextAllowedTime, lastSubmissionTime } = useSubmitScores();
+  const { nextAllowedTime, lastSubmissionTime } = useSubmitScores();
+
+  // Track if user just completed attestation in this session
+  const [justAttested, setJustAttested] = useState(false);
+
+  // Callback when attestation succeeds
+  const handleAttestSuccess = useCallback(() => {
+    setJustAttested(true);
+  }, []);
 
   // User has attested if: just completed attestation OR has a previous submission on-chain
-  const hasAttested = submitState === 'success' || (lastSubmissionTime !== null && lastSubmissionTime > 0);
+  const hasAttested = justAttested || (lastSubmissionTime !== null && lastSubmissionTime > 0);
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
 
   // Only show countdown if cooldown is still active
@@ -109,6 +118,7 @@ export function OnchainProfileCard({
                 <SubmitScoresButton
                   disabled={ssaIndex === null}
                   hasMinted={hasMintedSBT}
+                  onAttestSuccess={handleAttestSuccess}
                 />
               </div>
               <div className="sm:flex-1">
@@ -197,6 +207,7 @@ export function OnchainProfileCard({
                 <SubmitScoresButton
                   disabled={ssaIndex === null}
                   hasMinted={hasMintedSBT}
+                  onAttestSuccess={handleAttestSuccess}
                 />
               </div>
               <div className="sm:flex-1 sm:min-w-[140px]">

@@ -54,7 +54,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
     if (!signerPrivateKey) {
       console.error('BACKEND_SIGNER_PRIVATE_KEY not configured');
       return NextResponse.json(
-        { success: false, error: 'Backend signing not configured' },
+        { success: false, error: 'Service temporarily unavailable. Please try again later.' },
         { status: 500 }
       );
     }
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
 
     if (!payload || !payload.user) {
       return NextResponse.json(
-        { success: false, error: 'Invalid payload' },
+        { success: false, error: 'Invalid request. Please refresh and try again.' },
         { status: 400 }
       );
     }
@@ -89,14 +89,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
     // Validate payload structure
     if (!Array.isArray(payload.providers) || !Array.isArray(payload.scores)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid providers or scores array' },
+        { success: false, error: 'Invalid score data. Please refresh and try again.' },
         { status: 400 }
       );
     }
 
     if (payload.providers.length !== payload.scores.length) {
       return NextResponse.json(
-        { success: false, error: 'Providers and scores length mismatch' },
+        { success: false, error: 'Invalid score data. Please refresh and try again.' },
         { status: 400 }
       );
     }
@@ -142,13 +142,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
   } catch (error) {
     console.error('Sign scores API error:', error);
 
-    // Provide more detailed error message
-    const errorMessage = error instanceof Error
-      ? error.message
-      : 'Internal server error';
-
+    // User-friendly error message (don't expose internal details)
     return NextResponse.json(
-      { success: false, error: errorMessage },
+      { success: false, error: 'Unable to process your request. Please try again.' },
       { status: 500 }
     );
   }

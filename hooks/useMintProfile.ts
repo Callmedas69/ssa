@@ -7,6 +7,7 @@ import { useAccount } from "wagmi";
 import { CONTRACTS } from "@/abi/addresses";
 import { ProfileSBTABI } from "@/abi/ProfileSBT";
 import { SocialScoreAttestatorABI } from "@/abi/SocialScoreAttestator";
+import { humanizeError } from "@/lib/errors";
 import type { Hex } from "viem";
 
 type MintState = 'idle' | 'checking' | 'fetching' | 'ready' | 'minting' | 'confirming' | 'success' | 'error';
@@ -52,11 +53,11 @@ export function useMintProfile() {
     }
   }, [address]);
 
-  const fetchVoucher = useCallback(async () => {
+  const fetchVoucher = useCallback(async (): Promise<{ voucher: MintVoucher; signature: Hex } | null> => {
     if (!address) {
       setError("Wallet not connected");
       setState('error');
-      return;
+      return null;
     }
 
     setState('fetching');
@@ -83,14 +84,14 @@ export function useMintProfile() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to fetch mint voucher");
+        const data = await response.json().catch(() => ({ error: 'Unable to prepare your mint. Please try again.' }));
+        throw new Error(data.error || "Unable to prepare your mint. Please try again.");
       }
 
       const data = await response.json();
-      
+
       if (!data.success || !data.voucher || !data.signature) {
-        throw new Error("Invalid voucher response");
+        throw new Error("Something went wrong. Please try again.");
       }
 
       // Convert string values back to BigInt
@@ -105,18 +106,25 @@ export function useMintProfile() {
 
       setVoucher(voucherData);
       setState('ready');
-      return true;
+      return voucherData;  // Return voucher data for direct use
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error fetching voucher";
+      const rawMessage = err instanceof Error ? err.message : "";
+      // Preserve already-friendly messages, humanize others
+      const message = rawMessage.includes("verify your scores") || rawMessage.includes("Please")
+        ? rawMessage
+        : humanizeError(rawMessage);
       setError(message);
       setState('error');
-      return false;
+      return null;
     }
   }, [address]);
 
-  const mint = useCallback(async () => {
-    if (!voucher) {
-      setError("No voucher available");
+  const mint = useCallback(async (voucherParam?: { voucher: MintVoucher; signature: Hex } | null) => {
+    // Use passed voucher (preferred) or fall back to state
+    const voucherToUse = voucherParam || voucher;
+
+    if (!voucherToUse) {
+      setError("Please click the button again to mint.");
       setState('error');
       return;
     }
@@ -132,11 +140,11 @@ export function useMintProfile() {
         functionName: "mintProfile",
         args: [
           {
-            user: voucher.voucher.user,
-            expiresAt: voucher.voucher.expiresAt,
-            nonce: voucher.voucher.nonce,
+            user: voucherToUse.voucher.user,
+            expiresAt: voucherToUse.voucher.expiresAt,
+            nonce: voucherToUse.voucher.nonce,
           },
-          voucher.signature,
+          voucherToUse.signature,
         ],
       });
 
@@ -151,7 +159,8 @@ export function useMintProfile() {
       setHasMinted(true);
       setState('success');
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error minting profile";
+      const rawMessage = err instanceof Error ? err.message : "";
+      const message = humanizeError(rawMessage);
       setError(message);
       setState('error');
     }

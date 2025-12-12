@@ -51,9 +51,10 @@ export function MintProfileButton({
 
     if (state === "idle" || state === "error") {
       // Single-click flow: fetch voucher then mint immediately
-      const success = await fetchVoucher();
-      if (success) {
-        await mint();
+      // Pass voucher directly to mint to avoid React state closure timing issue
+      const voucherData = await fetchVoucher();
+      if (voucherData) {
+        await mint(voucherData);
       }
     } else if (state === "success") {
       reset();

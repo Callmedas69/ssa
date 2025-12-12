@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     return config;
   },
+  // Rewrite .well-known/farcaster.json to dynamic API route
+  async rewrites() {
+    return [
+      {
+        source: "/.well-known/farcaster.json",
+        destination: "/api/farcaster-manifest",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

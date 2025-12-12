@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useSubmitScores } from "@/hooks/useSubmitScores";
@@ -8,15 +9,24 @@ import { Loader2, Check, AlertCircle, ExternalLink } from "lucide-react";
 interface SubmitScoresButtonProps {
   disabled?: boolean;
   hasMinted?: boolean;
+  onAttestSuccess?: () => void;
 }
 
 export function SubmitScoresButton({
   disabled,
   hasMinted,
+  onAttestSuccess,
 }: SubmitScoresButtonProps) {
   const { isConnected } = useAccount();
   const { state, error, txHash, fetchSignature, submitToChain, reset } =
     useSubmitScores();
+
+  // Notify parent when attestation succeeds
+  useEffect(() => {
+    if (state === "success" && onAttestSuccess) {
+      onAttestSuccess();
+    }
+  }, [state, onAttestSuccess]);
 
   const handleClick = async () => {
     if (state === "idle" || state === "error") {

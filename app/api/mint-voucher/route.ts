@@ -80,7 +80,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<MintVouch
     if (!signerPrivateKey) {
       console.error('VOUCHER_SIGNER_PRIVATE_KEY not configured');
       return NextResponse.json(
-        { success: false, error: 'Voucher signing not configured' },
+        { success: false, error: 'Service temporarily unavailable. Please try again later.' },
         { status: 500 }
       );
     }
@@ -160,13 +160,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<MintVouch
   } catch (error) {
     console.error('Mint voucher API error:', error);
 
-    // Provide more detailed error message
-    const errorMessage = error instanceof Error
-      ? error.message
-      : 'Internal server error';
-
+    // User-friendly error message (don't expose internal details)
     return NextResponse.json(
-      { success: false, error: errorMessage },
+      { success: false, error: 'Unable to prepare your mint. Please try again.' },
       { status: 500 }
     );
   }

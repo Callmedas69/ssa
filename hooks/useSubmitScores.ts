@@ -10,6 +10,7 @@ import { SocialScoreAttestatorABI } from "@/abi/SocialScoreAttestator";
 
 import { isContractPaused } from "@/lib/contracts/providerValidation";
 import { PROVIDER_ID_MAP } from "@/lib/contracts/providerIds";
+import { humanizeError } from "@/lib/errors";
 import { getPublicClient } from "wagmi/actions";
 
 import type { Hex } from "viem";
@@ -67,11 +68,11 @@ export function useSubmitScores() {
 
       // 3. Fetch scores from backend
       const scoresRes = await fetch(`/api/scores?address=${address}`);
-      if (!scoresRes.ok) throw new Error("Failed to fetch scores");
+      if (!scoresRes.ok) throw new Error("Unable to load your scores. Please check your connection and try again.");
 
       const scoresData = await scoresRes.json();
       if (!scoresData.success || !scoresData.data) {
-        throw new Error("No scores available");
+        throw new Error("No reputation scores found for your wallet. Make sure you have activity on supported platforms.");
       }
 
       // 4. Build payload
@@ -108,13 +109,13 @@ export function useSubmitScores() {
       });
 
       if (!sigRes.ok) {
-        const errorData = await sigRes.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(errorData.error || "Backend signature failed");
+        const errorData = await sigRes.json().catch(() => ({ error: 'Unable to verify your scores. Please try again.' }));
+        throw new Error(errorData.error || "Unable to verify your scores. Please try again.");
       }
 
       const sigData = await sigRes.json();
       if (!sigData.success || !sigData.signature) {
-        throw new Error(sigData.error || "Invalid signature response");
+        throw new Error(sigData.error || "Something went wrong. Please try again.");
       }
 
       const { signature } = sigData;
@@ -123,8 +124,11 @@ export function useSubmitScores() {
       setState('ready');
       return true;
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error preparing signature";
+      const rawMessage = err instanceof Error ? err.message : "";
+      // Use human-friendly message, but preserve already-friendly messages (like 24h cooldown)
+      const message = rawMessage.includes("24 hours") || rawMessage.includes("paused") || rawMessage.includes("scores")
+        ? rawMessage
+        : humanizeError(rawMessage);
       setError(message);
       setState('error');
       return false;
@@ -133,7 +137,7 @@ export function useSubmitScores() {
 
   const submitToChain = useCallback(async () => {
     if (!signedPayload) {
-      setError("No signed payload available");
+      setError("Please click the button again to verify.");
       setState('error');
       return;
     }
@@ -191,24 +195,28 @@ export function useSubmitScores() {
 
       setState('success');
     } catch (err) {
-      let message = err instanceof Error ? err.message : "Unknown error submitting scores";
-      
-      // Parse SubmissionTooFrequent error to show user-friendly message
-      if (message.includes('SubmissionTooFrequent')) {
-        const match = message.match(/SubmissionTooFrequent\(uint256 nextAllowedTime\) \((\d+)\)/);
+      const rawMessage = err instanceof Error ? err.message : "";
+      let message: string;
+
+      // Parse SubmissionTooFrequent error to show user-friendly message with timing
+      if (rawMessage.includes('SubmissionTooFrequent')) {
+        const match = rawMessage.match(/SubmissionTooFrequent\(uint256 nextAllowedTime\) \((\d+)\)/);
         if (match && match[1]) {
           const nextAllowedTime = parseInt(match[1]);
           const now = Math.floor(Date.now() / 1000);
           const hoursRemaining = Math.ceil((nextAllowedTime - now) / 3600);
           const timeRemaining = hoursRemaining > 1 ? `${hoursRemaining} hours` : `${Math.ceil((nextAllowedTime - now) / 60)} minutes`;
-          
+
           const nextAllowedDate = new Date(nextAllowedTime * 1000).toLocaleString();
-          message = `You can only submit scores once every 24 hours. Please wait ${timeRemaining}. Next submission available at: ${nextAllowedDate}`;
+          message = `You can only verify once every 24 hours. Please wait ${timeRemaining}. Next available at: ${nextAllowedDate}`;
         } else {
-          message = "You can only submit scores once every 24 hours. Please try again later.";
+          message = "You can only verify once every 24 hours. Please try again later.";
         }
+      } else {
+        // Use humanizeError for other errors
+        message = humanizeError(rawMessage);
       }
-      
+
       setError(message);
       setState('error');
     }
