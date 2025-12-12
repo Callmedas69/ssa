@@ -22,12 +22,13 @@ export function MintStep({
     <div className="space-y-8">
       {/* Introduction Text */}
       <div className="text-center">
-        <h3 className="text-3xl sm:text-4xl font-[family-name:var(--font-luckiest-guy)] text-[#2D2A26] mb-2 retro-text-3d">
-          Verify & Mint
+        <h3 className="text-4xl sm:text-5xl font-[family-name:var(--font-luckiest-guy)] text-[#2D2A26] mb-2 retro-text-3d">
+          Attest & Mint
         </h3>
-        <p className="text-[#8B8680] text-sm max-w-md mx-auto">
-          Submit your scores to the blockchain for verification, then mint your
-          unique Soulbound Token (SBT) profile.
+        <p className="text-[#8B8680] text-sm max-w-md mx-auto italic">
+          Attest your scores to the blockchain
+        <br />  
+        Mint your unique Soulbound Token (SBT).
         </p>
       </div>
 
@@ -49,7 +50,7 @@ export function MintStep({
       <div className="text-center">
         <p className="text-[10px] text-[#8B8680] italic">
           {!hasMintedSBT
-            ? "First, verify your scores on-chain. Then you can mint your SBT Profile."
+            ? "First, attest your scores onchain. Then mint your SBT Profile."
             : "You can update your scores again after 24 hours."}
         </p>
       </div>

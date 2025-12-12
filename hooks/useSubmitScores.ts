@@ -169,6 +169,26 @@ export function useSubmitScores() {
       setState('confirming');
       await waitForTransactionReceipt(wagmiConfig, { hash });
 
+      // Refresh attestation status from contract (source of truth)
+      // This ensures lastSubmissionTime is updated before success state
+      if (address) {
+        const publicClient = getPublicClient(wagmiConfig);
+        const lastUpdated = await publicClient.readContract({
+          address: CONTRACTS.SocialScoreAttestator as `0x${string}`,
+          abi: SocialScoreAttestatorABI,
+          functionName: "lastUpdated",
+          args: [address],
+        });
+
+        if (lastUpdated && Number(lastUpdated) > 0) {
+          const lastTime = Number(lastUpdated);
+          const MIN_INTERVAL = 86400; // 24 hours
+          const nextTime = lastTime + MIN_INTERVAL;
+          setLastSubmissionTime(lastTime);
+          setNextAllowedTime(nextTime);
+        }
+      }
+
       setState('success');
     } catch (err) {
       let message = err instanceof Error ? err.message : "Unknown error submitting scores";
@@ -192,7 +212,7 @@ export function useSubmitScores() {
       setError(message);
       setState('error');
     }
-  }, [signedPayload]);
+  }, [signedPayload, address]);
 
   const checkSubmissionStatus = useCallback(async () => {
     if (!address) return;

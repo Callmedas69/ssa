@@ -77,7 +77,7 @@ export function MintProfileButton({
         return (
           <span className="flex items-center justify-center gap-2">
             <Award className="h-4 w-4" />
-            MINT BADGE
+            MINT SBT
           </span>
         );
       case "checking":
@@ -124,7 +124,7 @@ export function MintProfileButton({
           </span>
         );
       default:
-        return "MINT BADGE";
+        return "MINT SBT";
     }
   };
 
@@ -150,7 +150,7 @@ export function MintProfileButton({
         }
         className="w-full flex justify-center flex-row items-center"
         aria-label={
-          hasMinted ? "Profile badge already minted" : "Mint Profile Badge"
+          hasMinted ? "SBT Profile already minted" : "Mint Profile SBT"
         }
         aria-busy={isLoading}
         aria-disabled={isDisabled}
@@ -166,12 +166,12 @@ export function MintProfileButton({
           </p>
           {error.includes("already minted") && (
             <p className="text-xs text-[#8B8680] text-center">
-              You already have a Profile Badge.
+              You already have a SBT Profile.
             </p>
           )}
           {error.includes("voucher") && (
             <p className="text-xs text-[#8B8680] text-center">
-              Issue generating your badge. Please try again.
+              Issue generating your SBT. Please try again.
             </p>
           )}
         </div>
@@ -192,13 +192,13 @@ export function MintProfileButton({
 
       {hasMinted && state === "idle" && (
         <p className="text-xs text-center text-[#8B8680]">
-          Your badge is already minted!
+          Your SBT is already minted!
         </p>
       )}
 
       {!hasAttested && !hasMinted && (
         <p className="text-xs text-center text-[#8B8680]">
-          Verify your scores first
+          Attest your scores first
         </p>
       )}
     </div>

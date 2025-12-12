@@ -247,12 +247,12 @@ export function WizardFlow() {
                 ) : null}
               </div>
 
-              {/* Step Indicator Dots - Center */}
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Step Indicator Dots - Mobile only */}
+              <div className="flex sm:hidden items-center gap-1.5">
                 {[1, 2, 3, 4, 5, 6].map((step) => (
                   <div
                     key={step}
-                    className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       step === currentStep
                         ? "bg-[#E85D3B] scale-125"
                         : step < currentStep

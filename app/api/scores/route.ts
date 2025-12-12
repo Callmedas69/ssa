@@ -142,8 +142,8 @@ export async function GET(request: NextRequest): Promise<NextResponse<ScoreApiRe
     };
 
     const response = NextResponse.json({ success: true, data: scores });
-    // Cache for 5 minutes (private - per user)
-    response.headers.set('Cache-Control', 'private, max-age=300');
+    // No cache - scores change after attestation, must always be fresh
+    response.headers.set('Cache-Control', 'no-store');
     return response;
   } catch (error) {
     console.error('API error fetching scores:', error);

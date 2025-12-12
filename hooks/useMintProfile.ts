@@ -6,6 +6,7 @@ import { wagmiConfig } from "@/lib/wagmi/config";
 import { useAccount } from "wagmi";
 import { CONTRACTS } from "@/abi/addresses";
 import { ProfileSBTABI } from "@/abi/ProfileSBT";
+import { SocialScoreAttestatorABI } from "@/abi/SocialScoreAttestator";
 import type { Hex } from "viem";
 
 type MintState = 'idle' | 'checking' | 'fetching' | 'ready' | 'minting' | 'confirming' | 'success' | 'error';
@@ -62,6 +63,18 @@ export function useMintProfile() {
     setError(null);
 
     try {
+      // Verify user has attested on-chain (contract is source of truth)
+      const lastUpdated = await readContract(wagmiConfig, {
+        address: CONTRACTS.SocialScoreAttestator as `0x${string}`,
+        abi: SocialScoreAttestatorABI,
+        functionName: "lastUpdated",
+        args: [address],
+      });
+
+      if (!lastUpdated || Number(lastUpdated) === 0) {
+        throw new Error("Please verify your scores first before minting.");
+      }
+
       // Request voucher from backend
       const response = await fetch("/api/mint-voucher", {
         method: "POST",

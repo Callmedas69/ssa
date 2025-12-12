@@ -30,6 +30,9 @@ export function OnchainProfileCard({
   const hasAttested = submitState === 'success' || (lastSubmissionTime !== null && lastSubmissionTime > 0);
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
 
+  // Only show countdown if cooldown is still active
+  const isInCooldown = nextAllowedTime && nextAllowedTime > Math.floor(Date.now() / 1000);
+
   // Retro theme styling
   if (theme === "retro") {
     return (
@@ -70,7 +73,26 @@ export function OnchainProfileCard({
                 </span>
               </div>
 
-              {nextAllowedTime && (
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="text-sm font-bold text-[#2D2A26] uppercase">
+                  SSA Index
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-[#2D2A26]">
+                    {ssaIndex !== null ? ssaIndex : "—"}
+                  </span>
+                  {ssaTier && (
+                    <span className="text-xs font-bold text-[#E85D3B] uppercase">
+                      {ssaTier === "bronze" && "NEWCOMER"}
+                      {ssaTier === "silver" && "RISING"}
+                      {ssaTier === "gold" && "TRUSTED"}
+                      {ssaTier === "platinum" && "LEGEND"}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {isInCooldown && (
                 <div className="flex items-baseline justify-between gap-4 pt-2 border-t border-[#E8E3DB]">
                   <span className="text-sm font-bold text-[#2D2A26] uppercase">
                     Next Update
@@ -158,7 +180,7 @@ export function OnchainProfileCard({
                 </div>
               </div>
 
-              {nextAllowedTime && (
+              {isInCooldown && (
                 <div className="flex items-baseline justify-between gap-8 pt-2">
                   <span className="text-[11px] font-bold text-black uppercase">
                     Next Attestation
