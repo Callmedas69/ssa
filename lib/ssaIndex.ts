@@ -17,6 +17,14 @@ export const TIER_LABELS: Record<SSAIndexTier, string> = {
   platinum: "LEGENDARY",
 } as const;
 
+// Tier greeting messages
+export const TIER_MESSAGES: Record<SSAIndexTier, string> = {
+  bronze: "Welcome Aboard!",
+  silver: "Rising Star!",
+  gold: "Trusted Member!",
+  platinum: "Legendary!",
+} as const;
+
 /**
  * Determine tier based on score
  */

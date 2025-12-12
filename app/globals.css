@@ -393,7 +393,23 @@
 .retro-progress-fill {
   background: linear-gradient(90deg, #E85D3B, #F4A261);
   height: 100%;
-  transition: width 0.3s ease;
+  transition: width 1s ease-out;
+}
+
+.retro-progress-fill-loading {
+  background: linear-gradient(90deg, #E85D3B, #F4A261);
+  height: 100%;
+  width: 30%;
+  animation: loading-slide 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
 }
 
 /* Retro Section Divider */

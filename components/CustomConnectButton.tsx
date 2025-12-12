@@ -93,7 +93,7 @@ export function CustomConnectButton() {
                     {account.displayName}
                   </span>
                   <span className="sm:hidden">
-                    {account.displayName?.slice(0, 6)}...
+                    {account.address.slice(0, 4)}...{account.address.slice(-4)}
                   </span>
                 </button>
               );

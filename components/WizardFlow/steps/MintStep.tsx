@@ -22,7 +22,7 @@ export function MintStep({
     <div className="space-y-8">
       {/* Introduction Text */}
       <div className="text-center">
-        <h3 className="text-4xl sm:text-5xl font-[family-name:var(--font-luckiest-guy)] text-[#2D2A26] mb-2 retro-text-3d">
+        <h3 className="text-5xl sm:text-6xl font-[family-name:var(--font-luckiest-guy)] text-[#2D2A26] mb-2 retro-text-3d">
           Attest & Mint
         </h3>
         <p className="text-[#8B8680] text-sm max-w-md mx-auto italic">

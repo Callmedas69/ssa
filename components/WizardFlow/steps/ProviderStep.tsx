@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import type { SocialScores } from "@/lib/types";
 
@@ -26,6 +27,31 @@ const PROVIDERS: Array<{
 ];
 
 export function ProviderStep({ scores, isLoading }: ProviderStepProps) {
+  const [animatedWidths, setAnimatedWidths] = useState<Record<string, number>>({});
+
+  // Animate progress bars from 0 to actual values
+  useEffect(() => {
+    if (scores && !isLoading) {
+      const timer = setTimeout(() => {
+        const widths: Record<string, number> = {};
+        for (const provider of PROVIDERS) {
+          const score = scores[provider.id as keyof typeof scores];
+          if (score && typeof score === 'object' && 'score' in score) {
+            const rawScore = score.score;
+            const progressWidth = provider.noCap
+              ? Math.min((rawScore / provider.max) * 100, 100)
+              : (rawScore / provider.max) * 100;
+            widths[provider.id] = progressWidth;
+          } else {
+            widths[provider.id] = 0;
+          }
+        }
+        setAnimatedWidths(widths);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [scores, isLoading]);
+
   const getScore = (id: string) => {
     const scoreMap: Record<string, { score: number } | undefined> = {
       neynar: scores?.neynar ?? undefined,
@@ -46,12 +72,14 @@ export function ProviderStep({ scores, isLoading }: ProviderStepProps) {
         </h3>
         <div className="flex flex-col gap-2 w-full max-w-md">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-[#E8E3DB]/50 rounded-lg p-3 animate-pulse">
+            <div key={i} className="bg-[#F5F0E8] border border-[#2D2A26]/20 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-5 h-5 bg-[#E8E3DB] rounded-full" />
-                <div className="w-16 h-4 bg-[#E8E3DB] rounded" />
+                <div className="w-5 h-5 bg-[#E8E3DB] rounded-full animate-pulse" />
+                <div className="w-16 h-4 bg-[#E8E3DB] rounded animate-pulse" />
               </div>
-              <div className="h-2 bg-[#E8E3DB] rounded w-full" />
+              <div className="retro-progress h-2">
+                <div className="retro-progress-fill-loading" />
+              </div>
             </div>
           ))}
         </div>
@@ -61,7 +89,7 @@ export function ProviderStep({ scores, isLoading }: ProviderStepProps) {
 
   return (
     <div className="flex flex-col items-center justify-center flex-1 py-4">
-      <h3 className="uppercase text-base text-center font-bold text-[#2D2A26] tracking-wide mb-4">
+      <h3 className="uppercase text-6xl text-center font-bold text-[#2D2A26] retro-text-3d tracking-wide mb-8 font-[family-name:var(--font-luckiest-guy)]">
         Provider Scores
       </h3>
       <div className="flex flex-col gap-2 w-full max-w-md">
@@ -103,7 +131,7 @@ export function ProviderStep({ scores, isLoading }: ProviderStepProps) {
                 <div className="retro-progress h-2 flex-1">
                   <div
                     className="retro-progress-fill"
-                    style={{ width: `${progressWidth}%` }}
+                    style={{ width: `${animatedWidths[provider.id] ?? 0}%` }}
                   />
                 </div>
                 <span className="text-xs font-mono text-[#8B8680] w-12 text-right">

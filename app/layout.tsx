@@ -40,29 +40,6 @@ export const metadata: Metadata = {
   title: "SSA Index - Onchain Reputation Score",
   description:
     "Your unified SSA Index from 6 reputation providers - Neynar, Ethos, Talent, Quotient, and Passport. Verified on Base.",
-  openGraph: {
-    title: "SSA Index - Onchain Reputation Score",
-    description:
-      "Your unified SSA Index from 6 reputation providers. Verified on Base.",
-    url: appUrl,
-    siteName: "SSA Index",
-    images: [
-      {
-        url: `${appUrl}/api/og`,
-        width: 1200,
-        height: 630,
-        alt: "SSA Index - Onchain Reputation Score",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "SSA Index - Onchain Reputation Score",
-    description:
-      "Your unified SSA Index from 6 reputation providers. Verified on Base.",
-    images: [`${appUrl}/api/og`],
-  },
   other: {
     "fc:miniapp": JSON.stringify(miniAppEmbed),
   },

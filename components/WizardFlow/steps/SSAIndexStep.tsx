@@ -1,7 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import type { SocialScores } from "@/lib/types";
-import { TIERS, TIER_LABELS } from "@/lib/ssaIndex";
+import { TIERS, TIER_LABELS, TIER_MESSAGES } from "@/lib/ssaIndex";
 import { Badge } from "@/components/ui/badge";
 
 interface SSAIndexStepProps {
@@ -11,6 +12,19 @@ interface SSAIndexStepProps {
 }
 
 export function SSAIndexStep({ scores, isLoading, error }: SSAIndexStepProps) {
+  const [animatedWidth, setAnimatedWidth] = useState(0);
+
+  // Animate progress bar fill from 0 to actual score
+  useEffect(() => {
+    if (scores?.ssaIndex?.score !== undefined) {
+      // Small delay to ensure DOM is ready, then animate
+      const timer = setTimeout(() => {
+        setAnimatedWidth(scores.ssaIndex.score);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [scores?.ssaIndex?.score]);
+
   if (error) {
     return (
       <div className="text-center py-12 space-y-4">
@@ -32,9 +46,9 @@ export function SSAIndexStep({ scores, isLoading, error }: SSAIndexStepProps) {
     <div className="flex flex-col items-center justify-center flex-1 space-y-6 py-8">
       {isLoading ? (
         <div className="space-y-6 text-center">
-          <div className="h-12 sm:h-16 w-32 sm:w-40 bg-[#E8E3DB] rounded animate-pulse mx-auto" />
+          
           <div className="retro-progress max-w-md mx-auto">
-            <div className="retro-progress-fill w-0" />
+            <div className="retro-progress-fill-loading" />
           </div>
           <p className="text-[#8B8680] text-sm">Loading your score...</p>
         </div>
@@ -42,13 +56,15 @@ export function SSAIndexStep({ scores, isLoading, error }: SSAIndexStepProps) {
         <div className="space-y-6 text-center w-full max-w-md">
           {/* Score Display */}
           <div className="space-y-2">
-            <span className="text-5xl sm:text-6xl font-bold text-[#2D2A26] retro-text-3d block">
+          <h3 className="text-5xl sm:text-6xl font-[family-name:var(--font-luckiest-guy)] text-[#2D2A26] mb-1 retro-text-3d">
+            TRUSTCHECK
+          </h3>
+            <span className="text-9xl sm:text-8xl font-bold text-[#2D2A26] retro-text-3d block font-[family-name:var(--font-luckiest-guy)]">
               {scores.ssaIndex.score}
             </span>
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-lg text-[#8B8680] font-medium">SSA INDEX</span>
-              <span className="text-sm text-[#8B8680]">/ 100</span>
-            </div>
+            <h3 className="text-xl sm:text-2xl font-[family-name:var(--font-luckiest-guy)] text-[#2D2A26] mb-1 retro-text-3d">
+            {TIER_MESSAGES[scores.ssaIndex.tier]}
+          </h3>
           </div>
 
           {/* Progress Bar */}
@@ -62,7 +78,7 @@ export function SSAIndexStep({ scores, isLoading, error }: SSAIndexStepProps) {
           >
             <div
               className="retro-progress-fill"
-              style={{ width: `${scores.ssaIndex.score}%` }}
+              style={{ width: `${animatedWidth}%` }}
             />
           </div>
 

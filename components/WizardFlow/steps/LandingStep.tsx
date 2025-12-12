@@ -19,13 +19,13 @@ export function LandingStep() {
       />
 
       {/* Title */}
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-[family-name:var(--font-luckiest-guy)] text-[#2D2A26] retro-text-3d tracking-wide leading-none">
-        TrustCheck
+      <h1 className="text-6xl font-[family-name:var(--font-luckiest-guy)] text-[#2D2A26] retro-text-3d tracking-wide leading-none mb-2">
+        Trust<br/>Check
       </h1>
 
       {/* Tagline */}
-      <p className="text-[#8B8680] text-[10px] italic sm:text-sm max-w-md mx-auto">
-      A verifiable reputation signal, onchain.
+      <p className="text-[#8B8680] text-sm italic sm:text-lg max-w-md mx-auto">
+      Onchain verifiable reputation signal
       </p>
 
       {/* Connect Button - always visible */}

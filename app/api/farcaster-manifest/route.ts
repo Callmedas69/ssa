@@ -11,7 +11,7 @@ export async function GET() {
     },
     miniapp: {
       version: "1",
-      name: "SSA Index",
+      name: "TRUSTCHECK",
       subtitle: "Onchain Reputation Score",
       description:
         "Your unified reputation score from 6 trusted providers. Attest onchain and mint your SBT on Base.",
@@ -27,7 +27,7 @@ export async function GET() {
       heroImageUrl: `${appUrl}/api/og`,
       tagline: "Onchain verifiable reputation",
       // OpenGraph
-      ogTitle: "SSA Index",
+      ogTitle: "TRUSTCHECK",
       ogDescription:
         "Your unified reputation score from 6 trusted providers. Verified on Base.",
       ogImageUrl: `${appUrl}/api/og`,
