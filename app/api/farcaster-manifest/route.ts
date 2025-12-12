@@ -14,7 +14,7 @@ export async function GET() {
       name: "SSA Index",
       subtitle: "Onchain Reputation Score",
       description:
-        "Your unified reputation score from 6 trusted providers - Neynar, Ethos, Talent, Quotient, and Passport. Attest onchain & mint your SBT on Base.",
+        "Your unified reputation score from 6 trusted providers. Attest onchain and mint your SBT on Base.",
       iconUrl: `${appUrl}/ssa_logo_v2.svg`,
       homeUrl: appUrl,
       imageUrl: `${appUrl}/api/og`,
@@ -25,9 +25,9 @@ export async function GET() {
       primaryCategory: "social",
       tags: ["reputation", "identity", "base", "attestation", "sbt"],
       heroImageUrl: `${appUrl}/api/og`,
-      tagline: "Your unified onchain reputation score",
+      tagline: "Onchain verifiable reputation",
       // OpenGraph
-      ogTitle: "SSA Index - Onchain Reputation Score",
+      ogTitle: "SSA Index",
       ogDescription:
         "Your unified reputation score from 6 trusted providers. Verified on Base.",
       ogImageUrl: `${appUrl}/api/og`,
@@ -36,6 +36,7 @@ export async function GET() {
       requiredCapabilities: [
         "wallet.getEthereumProvider",
       ],
+      noindex: true,
     },
   };
 
