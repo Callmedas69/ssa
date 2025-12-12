@@ -10,11 +10,26 @@ import {
   type ReactNode,
 } from "react";
 
-// EIP-1193 Provider interface
-interface EthereumProvider {
-  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-  on?: (event: string, callback: (...args: unknown[]) => void) => void;
-  removeListener?: (event: string, callback: (...args: unknown[]) => void) => void;
+// Safe area insets for mobile UI
+interface SafeAreaInsets {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
+// ComposeCast options type
+interface ComposeCastOptions {
+  text?: string;
+  embeds?: [] | [string] | [string, string];
+  parent?: { type: 'cast'; hash: string };
+  close?: boolean;
+  channelKey?: string;
+}
+
+// ComposeCast result type
+interface ComposeCastResult {
+  cast: { hash: string; channelKey?: string } | null;
 }
 
 interface FarcasterContextType {
@@ -28,12 +43,13 @@ interface FarcasterContextType {
     displayName: string | null;
     pfpUrl: string | null;
   } | null;
-  // Wallet
-  ethProvider: EthereumProvider | null;
+  // Mobile safe areas
+  safeAreaInsets: SafeAreaInsets | null;
   // Actions
-  getEthereumProvider: () => Promise<EthereumProvider | null>;
   openUrl: (url: string) => Promise<void>;
   close: () => Promise<void>;
+  composeCast: (options: ComposeCastOptions) => Promise<ComposeCastResult | undefined>;
+  addMiniApp: () => Promise<void>;
 }
 
 const FarcasterContext = createContext<FarcasterContextType>({
@@ -41,10 +57,11 @@ const FarcasterContext = createContext<FarcasterContextType>({
   isReady: false,
   context: null,
   user: null,
-  ethProvider: null,
-  getEthereumProvider: async () => null,
+  safeAreaInsets: null,
   openUrl: async () => {},
   close: async () => {},
+  composeCast: async () => undefined,
+  addMiniApp: async () => {},
 });
 
 interface FarcasterProviderProps {
@@ -58,22 +75,7 @@ export function FarcasterProvider({ children }: FarcasterProviderProps) {
     null
   );
   const [user, setUser] = useState<FarcasterContextType["user"]>(null);
-  const [ethProvider, setEthProvider] = useState<EthereumProvider | null>(null);
-
-  // Get Ethereum Provider (EIP-1193)
-  const getEthereumProvider = useCallback(async (): Promise<EthereumProvider | null> => {
-    if (!isInFarcaster) return null;
-
-    try {
-      // sdk.wallet.ethProvider is a property, not a function
-      const provider = sdk.wallet.ethProvider as unknown as EthereumProvider;
-      setEthProvider(provider);
-      return provider;
-    } catch (error) {
-      console.error("Failed to get Ethereum provider:", error);
-      return null;
-    }
-  }, [isInFarcaster]);
+  const [safeAreaInsets, setSafeAreaInsets] = useState<SafeAreaInsets | null>(null);
 
   // Open URL in browser (outside Farcaster)
   const openUrl = useCallback(async (url: string): Promise<void> => {
@@ -101,18 +103,45 @@ export function FarcasterProvider({ children }: FarcasterProviderProps) {
     }
   }, [isInFarcaster]);
 
+  // Compose a cast with optional text and embeds
+  const composeCast = useCallback(async (options: ComposeCastOptions): Promise<ComposeCastResult | undefined> => {
+    if (!isInFarcaster) return undefined;
+
+    try {
+      const result = await sdk.actions.composeCast(options);
+      return result as ComposeCastResult;
+    } catch (error) {
+      console.error("Failed to compose cast:", error);
+      return undefined;
+    }
+  }, [isInFarcaster]);
+
+  // Prompt user to add the Mini App (enables notifications)
+  const addMiniApp = useCallback(async (): Promise<void> => {
+    if (!isInFarcaster) return;
+
+    try {
+      await sdk.actions.addMiniApp();
+    } catch (error) {
+      // RejectedByUser or InvalidDomainManifestJson
+      console.error("Failed to add Mini App:", error);
+      throw error;
+    }
+  }, [isInFarcaster]);
+
   useEffect(() => {
     const initFarcaster = async () => {
       try {
-        // Get context - will be null if not in Farcaster client
-        const ctx = await sdk.context;
+        // Use official detection method per Farcaster docs
+        const isMiniApp = await sdk.isInMiniApp();
 
-        if (ctx) {
+        if (isMiniApp) {
           setIsInFarcaster(true);
+          const ctx = await sdk.context;
           setContext(ctx);
 
           // Extract user info if available
-          if (ctx.user) {
+          if (ctx?.user) {
             setUser({
               fid: ctx.user.fid ?? null,
               username: ctx.user.username ?? null,
@@ -121,23 +150,22 @@ export function FarcasterProvider({ children }: FarcasterProviderProps) {
             });
           }
 
-          // Initialize Ethereum provider
-          try {
-            const provider = sdk.wallet.ethProvider as unknown as EthereumProvider;
-            if (provider) {
-              setEthProvider(provider);
-            }
-          } catch {
-            console.debug("Ethereum provider not available");
+          // Store safe area insets for mobile UI
+          if (ctx?.client?.safeAreaInsets) {
+            setSafeAreaInsets(ctx.client.safeAreaInsets);
           }
 
           // Signal that app is ready to display (hides splash screen)
           await sdk.actions.ready();
-          setIsReady(true);
-        } else {
-          // Not in Farcaster client - mark as ready anyway
-          setIsReady(true);
+
+          // Enable back navigation for native gestures (iOS swipe, Android back)
+          try {
+            await sdk.back.enableWebNavigation();
+          } catch {
+            console.debug("Back navigation not available");
+          }
         }
+        setIsReady(true);
       } catch (error) {
         // Not in Farcaster client or SDK error
         console.debug("Farcaster SDK init:", error);
@@ -155,10 +183,11 @@ export function FarcasterProvider({ children }: FarcasterProviderProps) {
         isReady,
         context,
         user,
-        ethProvider,
-        getEthereumProvider,
+        safeAreaInsets,
         openUrl,
         close,
+        composeCast,
+        addMiniApp,
       }}
     >
       {children}

@@ -20,14 +20,14 @@ import { FarcasterProvider } from "@/components/FarcasterProvider";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
 
-// Farcaster Mini App embed configuration
-const farcasterFrame = {
+// Farcaster Mini App embed configuration for social sharing
+const miniAppEmbed = {
   version: "1",
   imageUrl: `${appUrl}/api/og`,
   button: {
     title: "Check Score",
     action: {
-      type: "launch_frame",
+      type: "launch_miniapp",
       name: "SSA Index",
       url: appUrl,
       splashImageUrl: `${appUrl}/splash.png`,
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     images: [`${appUrl}/api/og`],
   },
   other: {
-    "fc:miniapp": JSON.stringify(farcasterFrame),
+    "fc:miniapp": JSON.stringify(miniAppEmbed),
   },
 };
 

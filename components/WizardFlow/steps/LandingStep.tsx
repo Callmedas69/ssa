@@ -26,8 +26,6 @@ export function LandingStep() {
       {/* Tagline */}
       <p className="text-[#8B8680] text-[10px] italic sm:text-sm max-w-md mx-auto">
       A verifiable reputation signal, onchain.
-      <br/>
-      powered by SSA Index
       </p>
 
       {/* Connect Button - always visible */}
