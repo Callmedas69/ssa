@@ -20,7 +20,7 @@ export async function GET() {
       imageUrl: `${appUrl}/api/og`,
       buttonTitle: "Check Score",
       splashImageUrl: `${appUrl}/splash.png`,
-      splashBackgroundColor: "#F5F0E8",
+      splashBackgroundColor: "#FFFFFF",
       // Discovery metadata
       primaryCategory: "social",
       tags: ["reputation", "identity", "base", "attestation", "sbt"],
