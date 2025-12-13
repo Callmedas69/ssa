@@ -31,7 +31,7 @@ const miniAppEmbed = {
       name: "TRUSTCHECK",
       url: appUrl,
       splashImageUrl: `${appUrl}/splash.png`,
-      splashBackgroundColor: "#F5F0E8",
+      splashBackgroundColor: "#FFFFFF",
     },
   },
 };
