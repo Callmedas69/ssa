@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="450"><svg width="512" height="450" viewBox="0 50 512 450" xmlns="http://www.w3.org/2000/svg">
+
+    <rect width="100%" height="100%" fill="none"></rect>
+
+    <!-- LEFT SET -->
+    <!-- Matrix 1 -->
+    <circle cx="104" cy="154" r="40" fill="none" stroke="#000" stroke-width="1"></circle>
+    <!-- Matrix 2 -->
+    <circle cx="104" cy="256" r="40" fill="none" stroke="#000" stroke-width="1"></circle>
+    <!-- Matrix 3 -->
+    <circle cx="104" cy="357" r="40" fill="#000" stroke="#000" stroke-width="4"></circle>
+    <!-- Matrix 4 -->
+    <circle cx="205" cy="154" r="40" fill="#000" stroke="#000" stroke-width="4"></circle>
+    <!-- Matrix 5 -->
+    <circle cx="205" cy="256" r="40" fill="#000" stroke="#000" stroke-width="4"></circle>
+    <!-- Matrix 6 -->
+    <circle cx="205" cy="357" r="40" fill="#000" stroke="#000" stroke-width="4"></circle>
+
+    <!-- RIGHT SET -->
+    <!-- Matrix 1 -->
+    <circle cx="307" cy="154" r="40" fill="#f15bb5" stroke="#f15bb5" stroke-width="8"></circle>
+    <!-- Matrix 2 -->
+    <circle cx="307" cy="256" r="40" fill="#00f5d4" stroke="#00f5d4" stroke-width="8"></circle>
+    <!-- Matrix 3 -->
+    <circle cx="307" cy="357" r="40" fill="none" stroke="#000" stroke-width="1"></circle>
+    <!-- Matrix 4 -->
+    <circle cx="408" cy="154" r="40" fill="none" stroke="#000" stroke-width="1"></circle>
+    <!-- Matrix 5 -->
+    <circle cx="408" cy="256" r="40" fill="#fee440" stroke="#fee440" stroke-width="8"></circle>
+    <!-- Matrix 6 -->
+    <circle cx="408" cy="357" r="40" fill="none" stroke="#000" stroke-width="1"></circle>
+</svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>

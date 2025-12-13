@@ -28,10 +28,9 @@ export function WizardStep({
     () => {
       if (!containerRef.current || !isActive) return;
 
-      // Determine animation direction
-      const xOffset = direction === "forward" ? 100 : -100;
+      // Smooth slide + fade animation
+      const xOffset = direction === "forward" ? 60 : -60;
 
-      // Animate in
       gsap.fromTo(
         containerRef.current,
         {
@@ -41,7 +40,7 @@ export function WizardStep({
         {
           opacity: 1,
           x: 0,
-          duration: 0.4,
+          duration: 0.3,
           ease: "power2.out",
           onComplete: onAnimationComplete,
         }

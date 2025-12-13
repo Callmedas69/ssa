@@ -84,11 +84,11 @@ export function ProfileSBTDisplay({ hasMinted, address }: ProfileSBTDisplayProps
   }, [hasMinted, address]);
 
   return (
-    <div className="relative w-full max-w-64 aspect-square mac1-inset bg-white flex items-center justify-center overflow-hidden">
+    <div className="relative w-48 sm:w-64 aspect-square bg-white flex items-center justify-center overflow-hidden">
       {svgContent ? (
         // Inline SVG for CSS animation support
         <div
-          className="w-full h-full [&>svg]:w-full [&>svg]:h-full"
+          className="w-full h-full [&>svg]:w-full [&>svg]:h-full rounded-xl"
           dangerouslySetInnerHTML={{ __html: svgContent }}
         />
       ) : fallbackImage ? (
@@ -96,7 +96,7 @@ export function ProfileSBTDisplay({ hasMinted, address }: ProfileSBTDisplayProps
         <img
           src={fallbackImage}
           alt="Profile SBT"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-xl"
         />
       ) : (
         <div className="w-full h-full flex justify-center items-center text-center p-4">

@@ -15,10 +15,10 @@ export async function generateMetadata({
   const score = params.score || "0";
   const tier = params.tier || "bronze";
 
-  // Use static ogHero.png for app URL, dynamic OG for personalized scores
+  // Use /api/og route for both hero and personalized layouts
   const ogImageUrl = hasPersonalizedScore
     ? `${appUrl}/api/og?score=${score}&tier=${tier}`
-    : `${appUrl}/ogHero.png`;
+    : `${appUrl}/api/og`;
 
   const title = hasPersonalizedScore
     ? `TRUSTCHECK: ${score} - Check Your Onchain Reputation`

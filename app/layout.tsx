@@ -28,7 +28,7 @@ const miniAppEmbed = {
     title: "Check Score",
     action: {
       type: "launch_miniapp",
-      name: "SSA Index",
+      name: "TRUSTCHECK",
       url: appUrl,
       splashImageUrl: `${appUrl}/splash.png`,
       splashBackgroundColor: "#F5F0E8",
@@ -37,9 +37,9 @@ const miniAppEmbed = {
 };
 
 export const metadata: Metadata = {
-  title: "SSA Index - Onchain Reputation Score",
+  title: "TRUSTCHECK - Onchain Reputation Score",
   description:
-    "Your unified SSA Index from 6 reputation providers - Neynar, Ethos, Talent, Quotient, and Passport. Verified on Base.",
+    "Your aggregated score from 6 reputation providers - Neynar, Ethos, Talent, Quotient, and Passport. Verified on Base.",
   other: {
     "fc:miniapp": JSON.stringify(miniAppEmbed),
   },
@@ -52,6 +52,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <meta name="apple-mobile-web-app-title" content="TrustCheck" />
       <body className={`antialiased ${luckiestGuy.variable} ${ubuntu.className}`}>
         <WagmiQueryProviders>
           <FarcasterProvider>

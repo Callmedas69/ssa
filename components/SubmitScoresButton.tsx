@@ -42,7 +42,7 @@ export function SubmitScoresButton({
   const getButtonContent = () => {
     switch (state) {
       case "idle":
-        return hasMinted ? "UPDATE SCORE" : "VERIFY NOW";
+        return hasMinted ? "UPDATE" : "ATTEST";
       case "signing":
         return (
           <span className="flex flex-row items-center justify-center">
@@ -69,7 +69,7 @@ export function SubmitScoresButton({
         return (
           <span className="flex flex-row items-center justify-center">
             <Check className="mr-2 h-4 w-4" />
-            VERIFIED!
+            ATTESTED!
           </span>
         );
       case "error":
@@ -87,7 +87,7 @@ export function SubmitScoresButton({
           </span>
         );
       default:
-        return "VERIFY NOW";
+        return "ATTEST";
     }
   };
 
@@ -113,8 +113,8 @@ export function SubmitScoresButton({
         className="w-full min-w-[140px] flex-1 flex items-center justify-center"
         aria-label={
           hasMinted
-            ? "Update social scores on-chain"
-            : "Verify social scores on-chain"
+            ? "Update social scores attestation"
+            : "Attest social scores on-chain"
         }
         aria-busy={isLoading}
         aria-disabled={isDisabled}
