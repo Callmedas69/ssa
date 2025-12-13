@@ -57,7 +57,7 @@ export function ShareStep({ scores }: ShareStepProps) {
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
             <button
               onClick={() => {
-                const text = `My TRUSTCHECK is ${scores.ssaIndex?.score} i am a ${TIER_LABELS[currentTier]}!\n\nCheck your onchain reputation score and mint your SBT\n\n`;
+                const text = `My TrustCheck is ${scores.ssaIndex?.score} i am a ${TIER_LABELS[currentTier]}!\n\nCheck your onchain reputation score and mint your SBT\n\n`;
                 window.open(
                   `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`,
                   "_blank",
@@ -74,7 +74,7 @@ export function ShareStep({ scores }: ShareStepProps) {
 
             <button
               onClick={async () => {
-                const text = `My TRUSTCHECK is ${scores.ssaIndex?.score} i am a ${TIER_LABELS[currentTier]}!\n\ncheck your onchain reputation score and mint your SBT\n\n`;
+                const text = `My TrustCheck is ${scores.ssaIndex?.score} i am a ${TIER_LABELS[currentTier]}!\n\ncheck your onchain reputation score and mint your SBT`;
 
                 if (isInFarcaster) {
                   // Use SDK composeCast - stays in Farcaster
@@ -110,7 +110,7 @@ export function ShareStep({ scores }: ShareStepProps) {
           {/* Collection Links - Secondary actions */}
           <div className="flex items-center justify-center gap-4 pt-2 text-xs text-[#8B8680]">
             <a
-              href={`https://opensea.io/assets/base/${CONTRACTS.ProfileSBT}`}
+              href={`https://opensea.io/assets/base/trust-check`}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-[#2D2A26] underline transition-colors flex items-center gap-1 cursor-pointer"

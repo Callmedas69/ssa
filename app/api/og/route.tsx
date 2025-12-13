@@ -80,6 +80,7 @@ export async function GET(request: NextRequest) {
             display: "flex",
             flexWrap: "wrap",
             justifyContent: "center",
+            fontStyle: "italic",
           }}
         >
           <span>Aggregating your social reputation score into a single </span>
