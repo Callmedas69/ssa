@@ -110,7 +110,7 @@ export function ShareStep({ scores }: ShareStepProps) {
           {/* Collection Links - Secondary actions */}
           <div className="flex items-center justify-center gap-4 pt-2 text-xs text-[#8B8680]">
             <a
-              href={`https://opensea.io/assets/base/trust-check`}
+              href={`https://opensea.io/collection/trust-check`}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-[#2D2A26] underline transition-colors flex items-center gap-1 cursor-pointer"
