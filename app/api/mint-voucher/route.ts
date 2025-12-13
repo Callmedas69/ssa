@@ -158,7 +158,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<MintVouch
     response.headers.set('Cache-Control', 'no-store');
     return response;
   } catch (error) {
-    console.error('Mint voucher API error:', error);
+    console.error('[api/mint-voucher] Failed:', { error: error instanceof Error ? error.message : error });
 
     // User-friendly error message (don't expose internal details)
     return NextResponse.json(

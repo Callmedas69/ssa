@@ -122,7 +122,7 @@ contract ProfileSBTRenderer is
         // Build JSON metadata
         string memory json = string(
             abi.encodePacked(
-                '{"name":"SSA Profile #',
+                '{"name":"TrustCheck #',
                 tokenId.toString(),
                 '",',
                 '"description":"Social Score Attestation Profile - Soulbound Token",',
@@ -297,7 +297,7 @@ contract ProfileSBTRenderer is
         return
             string(
                 abi.encodePacked(
-                    '[{"trait_type":"SSA Index","value":',
+                    '[{"trait_type":"TrustCheck","value":',
                     ssaIndex.toString(),
                     "},",
                     '{"trait_type":"Ethos","value":',

@@ -68,7 +68,7 @@ export const fetchQuotient: ProviderFetcher = async (input): Promise<ProviderRes
 
     if (!response.ok) {
       if (response.status === 404) return null;
-      console.error(`Quotient API error: ${response.status}`);
+      console.error('[quotient] API error:', { fid, status: response.status });
       return null;
     }
 
@@ -89,7 +89,7 @@ export const fetchQuotient: ProviderFetcher = async (input): Promise<ProviderRes
       },
     };
   } catch (error) {
-    console.error('Quotient fetch error:', error);
+    console.error('[quotient] Fetch failed:', { fid, error: error instanceof Error ? error.message : error });
     return null;
   }
 };

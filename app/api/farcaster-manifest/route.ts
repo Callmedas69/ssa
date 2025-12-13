@@ -36,7 +36,7 @@ export async function GET() {
       requiredCapabilities: [
         "wallet.getEthereumProvider",
       ],
-      noindex: true,
+      noindex: false,
     },
   };
 

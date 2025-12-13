@@ -59,7 +59,7 @@ async function fetchTalentScore(
 
     if (!response.ok) {
       if (response.status === 404) return null;
-      console.error(`Talent API error (${scorerSlug}): ${response.status}`);
+      console.error('[talent] API error:', { address, scorer: scorerSlug, status: response.status });
       return null;
     }
 
@@ -74,7 +74,7 @@ async function fetchTalentScore(
       },
     };
   } catch (error) {
-    console.error(`Talent fetch error (${scorerSlug}):`, error);
+    console.error('[talent] Fetch failed:', { address, scorer: scorerSlug, error: error instanceof Error ? error.message : error });
     return null;
   }
 }

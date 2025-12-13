@@ -46,7 +46,7 @@ export const fetchNeynar: ProviderFetcher = async (input): Promise<ProviderResul
 
     if (!response.ok) {
       if (response.status === 404) return null;
-      console.error(`Neynar API error: ${response.status}`);
+      console.error('[neynar] API error:', { address, status: response.status });
       return null;
     }
 
@@ -66,7 +66,7 @@ export const fetchNeynar: ProviderFetcher = async (input): Promise<ProviderResul
       },
     };
   } catch (error) {
-    console.error('Neynar fetch error:', error);
+    console.error('[neynar] Fetch failed:', { address, error: error instanceof Error ? error.message : error });
     return null;
   }
 };

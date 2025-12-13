@@ -40,6 +40,29 @@ export const metadata: Metadata = {
   title: "TRUSTCHECK - Onchain Reputation Score",
   description:
     "Your aggregated score from 6 reputation providers - Neynar, Ethos, Talent, Quotient, and Passport. Verified on Base.",
+  openGraph: {
+    title: "TRUSTCHECK - Onchain Reputation Score",
+    description:
+      "Your aggregated score from 6 reputation providers. Attest onchain and mint your SBT on Base.",
+    url: appUrl,
+    siteName: "TRUSTCHECK",
+    images: [
+      {
+        url: `${appUrl}/api/og`,
+        width: 1200,
+        height: 630,
+        alt: "TRUSTCHECK - Onchain Reputation Score",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TRUSTCHECK - Onchain Reputation Score",
+    description:
+      "Your aggregated score from 6 reputation providers. Attest onchain and mint your SBT on Base.",
+    images: [`${appUrl}/api/og`],
+  },
   other: {
     "fc:miniapp": JSON.stringify(miniAppEmbed),
   },

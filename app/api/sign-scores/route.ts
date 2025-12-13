@@ -140,7 +140,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SignScore
     response.headers.set('Cache-Control', 'no-store');
     return response;
   } catch (error) {
-    console.error('Sign scores API error:', error);
+    console.error('[api/sign-scores] Failed:', { error: error instanceof Error ? error.message : error });
 
     // User-friendly error message (don't expose internal details)
     return NextResponse.json(

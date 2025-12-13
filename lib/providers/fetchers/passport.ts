@@ -57,14 +57,14 @@ export const fetchPassport: ProviderFetcher = async (input): Promise<ProviderRes
 
     if (!response.ok) {
       if (response.status === 404) return null;
-      console.error(`Passport API error: ${response.status}`);
+      console.error('[passport] API error:', { address, status: response.status });
       return null;
     }
 
     const data: PassportResponse = await response.json();
 
     if (data.error) {
-      console.error('Passport API returned error:', data.error);
+      console.error('[passport] API returned error:', { address, error: data.error });
       return null;
     }
 
@@ -82,7 +82,7 @@ export const fetchPassport: ProviderFetcher = async (input): Promise<ProviderRes
       },
     };
   } catch (error) {
-    console.error('Passport fetch error:', error);
+    console.error('[passport] Fetch failed:', { address, error: error instanceof Error ? error.message : error });
     return null;
   }
 };

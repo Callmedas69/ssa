@@ -146,7 +146,8 @@ export async function GET(request: NextRequest): Promise<NextResponse<ScoreApiRe
     response.headers.set('Cache-Control', 'no-store');
     return response;
   } catch (error) {
-    console.error('API error fetching scores:', error);
+    const address = request.nextUrl.searchParams.get('address');
+    console.error('[api/scores] Failed:', { address, error: error instanceof Error ? error.message : error });
 
     // Provide more detailed error message
     const errorMessage = error instanceof Error

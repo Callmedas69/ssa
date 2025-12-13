@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { sdk } from "@farcaster/miniapp-sdk";
+import { useFarcaster } from "@/components/FarcasterProvider";
 import type { SocialScores } from "@/lib/types";
 import { CONTRACTS } from "@/abi/addresses";
 import { TIER_LABELS, TIER_MESSAGES } from "@/lib/ssaIndex";
@@ -13,10 +13,13 @@ interface ShareStepProps {
 
 export function ShareStep({ scores }: ShareStepProps) {
   const [copied, setCopied] = useState(false);
+  const { isInFarcaster, composeCast } = useFarcaster();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
 
   const currentTier = scores?.ssaIndex?.tier || "bronze";
   const shareUrl = appUrl;
+  // Strip protocol for Farcaster embed (works better without https://)
+  const farcasterEmbedUrl = appUrl.replace(/^https?:\/\//, "");
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(shareUrl);
@@ -70,23 +73,20 @@ export function ShareStep({ scores }: ShareStepProps) {
             </button>
 
             <button
-              onClick={() => {
+              onClick={async () => {
                 const text = `My TRUSTCHECK is ${scores.ssaIndex?.score} i am a ${TIER_LABELS[currentTier]}!\n\ncheck your onchain reputation score and mint your SBT\n\n`;
-                const isInMiniapp = typeof window !== "undefined" && window.parent !== window;
 
-                if (isInMiniapp) {
-                  // Try SDK in Farcaster miniapp context
-                  sdk.actions.composeCast({ text, embeds: [shareUrl] }).catch(() => {
-                    window.open(
-                      `https://warpcast.com/~/compose?text=${encodeURIComponent(text + " " + shareUrl)}`,
-                      "_blank",
-                      "noopener,noreferrer"
-                    );
+                if (isInFarcaster) {
+                  // Use SDK composeCast - stays in Farcaster
+                  await composeCast({
+                    text,
+                    embeds: [farcasterEmbedUrl] as [string],
+                    channelKey: "geoart"
                   });
                 } else {
-                  // Direct to warpcast on desktop/browser
+                  // Desktop/browser fallback
                   window.open(
-                    `https://warpcast.com/~/compose?text=${encodeURIComponent(text + " " + shareUrl)}`,
+                    `https://warpcast.com/~/compose?text=${encodeURIComponent(text + " " + farcasterEmbedUrl)}&channelKey=geoart`,
                     "_blank",
                     "noopener,noreferrer"
                   );

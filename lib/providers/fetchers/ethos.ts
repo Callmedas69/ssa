@@ -49,7 +49,7 @@ export const fetchEthos: ProviderFetcher = async (input): Promise<ProviderResult
 
     if (!response.ok) {
       if (response.status === 404) return null;
-      console.error(`Ethos API error: ${response.status}`);
+      console.error('[ethos] API error:', { address, status: response.status });
       return null;
     }
 
@@ -62,7 +62,7 @@ export const fetchEthos: ProviderFetcher = async (input): Promise<ProviderResult
       },
     };
   } catch (error) {
-    console.error('Ethos fetch error:', error);
+    console.error('[ethos] Fetch failed:', { address, error: error instanceof Error ? error.message : error });
     return null;
   }
 };

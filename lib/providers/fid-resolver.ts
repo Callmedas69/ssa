@@ -53,7 +53,7 @@ export async function resolveFid(address: string): Promise<FidResolution | null>
         fidCache.set(normalizedAddress, { resolution: null, timestamp: Date.now() });
         return null;
       }
-      console.error(`Neynar FID resolution error: ${response.status}`);
+      console.error('[fid-resolver] API error:', { address: normalizedAddress, status: response.status });
       return null;
     }
 
@@ -77,7 +77,7 @@ export async function resolveFid(address: string): Promise<FidResolution | null>
     fidCache.set(normalizedAddress, { resolution, timestamp: Date.now() });
     return resolution;
   } catch (error) {
-    console.error('FID resolution error:', error);
+    console.error('[fid-resolver] Fetch failed:', { address: normalizedAddress, error: error instanceof Error ? error.message : error });
     return null;
   }
 }
