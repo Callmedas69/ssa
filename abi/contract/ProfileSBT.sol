@@ -338,6 +338,11 @@ contract ProfileSBT is
         return _tokenIdCounter;
     }
 
+    /// @notice Override ERC721 name to return "TrustCheck"
+    function name() public pure override returns (string memory) {
+        return "TrustCheck";
+    }
+
     // ------------------------------------------------------------------------
     // Metadata (Delegated to Renderer)
     // ------------------------------------------------------------------------

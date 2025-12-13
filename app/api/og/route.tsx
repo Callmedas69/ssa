@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
             justifyContent: "center",
           }}
         >
-          <span>Aggregating six independent social reputation signals into a single </span>
+          <span>Aggregating your social reputation score into a single </span>
           <span style={{ fontWeight: 700 }}>&nbsp;soulbound token,</span>
           <span>giving you a verifiable snapshot of your onchain credibility.</span>
         </div>
