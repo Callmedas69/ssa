@@ -8,7 +8,7 @@ import type { ProviderConfig, ProviderFetcher, ProviderResult } from '../registr
 export const neynarConfig: ProviderConfig = {
   id: 'neynar',
   name: 'Neynar',
-  weight: 0.20,
+  weight: 0.24,
   cap: 1,
   normalization: 'multiply',
   inputType: 'address',

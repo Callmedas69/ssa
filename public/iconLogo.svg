@@ -1,6 +1,6 @@
 <svg width="512" height="450" viewBox="0 50 512 450" xmlns="http://www.w3.org/2000/svg">
 
-    <rect width="100%" height="100%" fill="none" />
+    <rect width="100%" height="100%" fill="#ffffff" />
 
     <!-- LEFT SET -->
 
@@ -18,7 +18,6 @@
     <circle cx="307" cy="154" r="40" fill="#f15bb5" stroke="#f15bb5" stroke-width="8" />
     <!-- Matrix 2 -->
     <circle cx="307" cy="256" r="40" fill="#00f5d4" stroke="#00f5d4" stroke-width="8" />
-
 
     <!-- Matrix 5 -->
     <circle cx="408" cy="256" r="40" fill="#fee440" stroke="#fee440" stroke-width="8" />

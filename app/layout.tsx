@@ -25,7 +25,7 @@ const miniAppEmbed = {
   version: "1",
   imageUrl: `${appUrl}/api/og`,
   button: {
-    title: "Check Score",
+    title: "TrustCheck",
     action: {
       type: "launch_miniapp",
       name: "TRUSTCHECK",
@@ -39,11 +39,11 @@ const miniAppEmbed = {
 export const metadata: Metadata = {
   title: "TRUSTCHECK - Onchain Reputation Score",
   description:
-    "Your aggregated score from 6 reputation providers - Neynar, Ethos, Talent, Quotient, and Passport. Verified on Base.",
+    "Your aggregated score from well known reputation providers. Attest onchain and mint your SBT on Base.",
   openGraph: {
     title: "TRUSTCHECK - Onchain Reputation Score",
     description:
-      "Your aggregated score from 6 reputation providers. Attest onchain and mint your SBT on Base.",
+      "Your aggregated score from well known reputation providers. Attest onchain and mint your SBT on Base.",
     url: appUrl,
     siteName: "TRUSTCHECK",
     images: [
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "TRUSTCHECK - Onchain Reputation Score",
     description:
-      "Your aggregated score from 6 reputation providers. Attest onchain and mint your SBT on Base.",
+      "Your aggregated score from well known reputation providers. Attest onchain and mint your SBT on Base.",
     images: [`${appUrl}/api/og`],
   },
   other: {

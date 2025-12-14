@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Clock } from "lucide-react";
 
 interface CountdownTimerProps {
@@ -8,7 +8,7 @@ interface CountdownTimerProps {
   onComplete?: () => void;
 }
 
-export function CountdownTimer({
+export const CountdownTimer = memo(function CountdownTimer({
   targetTime,
   onComplete,
 }: CountdownTimerProps) {
@@ -54,4 +54,4 @@ export function CountdownTimer({
       <span className="font-mono font-semibold">{timeRemaining}</span>
     </span>
   );
-}
+});

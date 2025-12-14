@@ -1,28 +1,29 @@
 import { providerRegistry, normalizeScore, type ProviderResult } from './providers';
 import type { SSAIndex, SSAIndexTier, SSAIndexBreakdown } from './types';
+import { config } from './config';
 
-// Tier thresholds - single source of truth
+// Derive from single source of truth (config.ts)
+const { tiers } = config.ssaIndex;
+
 export const TIERS = {
-  platinum: { min: 90, max: 100 },
-  gold: { min: 70, max: 89 },
-  silver: { min: 40, max: 69 },
-  bronze: { min: 0, max: 39 },
+  platinum: { min: tiers.platinum.min, max: tiers.platinum.max },
+  gold: { min: tiers.gold.min, max: tiers.gold.max },
+  silver: { min: tiers.silver.min, max: tiers.silver.max },
+  bronze: { min: tiers.bronze.min, max: tiers.bronze.max },
 } as const;
 
-// Tier display labels
 export const TIER_LABELS: Record<SSAIndexTier, string> = {
-  bronze: "NEWCOMER",
-  silver: "RISING STAR",
-  gold: "TRUSTED",
-  platinum: "LEGENDARY",
+  bronze: tiers.bronze.label,
+  silver: tiers.silver.label,
+  gold: tiers.gold.label,
+  platinum: tiers.platinum.label,
 } as const;
 
-// Tier greeting messages
 export const TIER_MESSAGES: Record<SSAIndexTier, string> = {
-  bronze: "Welcome Aboard!",
-  silver: "Rising Star!",
-  gold: "Trusted Member!",
-  platinum: "Legendary!",
+  bronze: tiers.bronze.message,
+  silver: tiers.silver.message,
+  gold: tiers.gold.message,
+  platinum: tiers.platinum.message,
 } as const;
 
 /**
@@ -38,9 +39,10 @@ function getTier(score: number): SSAIndexTier {
 /**
  * Calculate SSA Index from provider results
  * Uses provider registry for weights and normalization
+ * Note: Only providers with includeInScore !== false are included (excludes Passport)
  */
 export function calculateSSAIndex(results: Map<string, ProviderResult | null>): SSAIndex {
-  const providers = providerRegistry.getEnabled();
+  const providers = providerRegistry.getForScoring();
   const breakdown: SSAIndexBreakdown[] = [];
   let totalWeight = 0;
   let weightedSum = 0;

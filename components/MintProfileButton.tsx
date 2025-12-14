@@ -143,7 +143,9 @@ export function MintProfileButton({
         onClick={handleClick}
         disabled={isDisabled}
         variant={
-          state === "success" || (hasMinted && state === "idle")
+          hasMinted
+            ? "retro-minted"
+            : state === "success"
             ? "retro-success"
             : state === "error"
             ? "retro-outline"

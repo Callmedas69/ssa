@@ -7,7 +7,7 @@ import type { ProviderConfig, ProviderFetcher, ProviderResult } from '../registr
 export const talentBuilderConfig: ProviderConfig = {
   id: 'talentBuilder',
   name: 'Talent Builder',
-  weight: 0.15,
+  weight: 0.18,
   cap: 200,
   normalization: 'divide',
   inputType: 'address',
@@ -20,7 +20,7 @@ export const talentBuilderConfig: ProviderConfig = {
 export const talentCreatorConfig: ProviderConfig = {
   id: 'talentCreator',
   name: 'Talent Creator',
-  weight: 0.12,
+  weight: 0.15,
   cap: 200,
   normalization: 'divide',
   inputType: 'address',

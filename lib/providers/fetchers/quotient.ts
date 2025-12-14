@@ -7,7 +7,7 @@ import type { ProviderConfig, ProviderFetcher, ProviderResult } from '../registr
 export const quotientConfig: ProviderConfig = {
   id: 'quotient',
   name: 'Quotient',
-  weight: 0.15,
+  weight: 0.19,
   cap: 1,
   normalization: 'multiply',
   inputType: 'fid',

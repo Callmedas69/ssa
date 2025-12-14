@@ -7,6 +7,7 @@ import { OnchainProfileCard } from "./OnchainProfileCard";
 import { AllProviderGuidance } from "./ProviderGuidance";
 import { useHasMintedSBT } from "@/hooks/useHasMintedSBT";
 import type { SocialScores, ScoreApiResponse } from "@/lib/types";
+import { TIER_LABELS } from "@/lib/ssaIndex";
 
 async function fetchScores(address: string): Promise<SocialScores> {
   try {
@@ -51,12 +52,6 @@ export function ScoresDashboard() {
     retry: 2,
   });
 
-  // Debug logging
-  if (scores) {
-    console.log("[ScoresDashboard] Scores data:", scores);
-    console.log("[ScoresDashboard] Identity:", scores.identity);
-  }
-
   if (!isConnected) {
     return (
       <div className="text-center py-16 px-4">
@@ -97,6 +92,7 @@ export function ScoresDashboard() {
           ssaIndex={scores?.ssaIndex?.score ?? null}
           ssaTier={scores?.ssaIndex?.tier ?? null}
           hasMintedSBT={hasMinted}
+          passportScore={scores?.passport?.score ?? null}
         />
       )}
 
@@ -105,14 +101,9 @@ export function ScoresDashboard() {
         <div className="flex gap-3 justify-center max-w-2xl w-full">
           <button
             onClick={() => {
-              const tierLabels: Record<string, string> = {
-                bronze: "NEWCOMER",
-                silver: "RISING STAR",
-                gold: "TRUSTED",
-                platinum: "LEGENDARY",
-              };
               const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
-              const text = `My SSA Index is ${scores.ssaIndex?.score} - ${tierLabels[scores.ssaIndex?.tier || "bronze"]}! Check your onchain reputation score at`;
+              const tier = scores.ssaIndex?.tier || "bronze";
+              const text = `My SSA Index is ${scores.ssaIndex?.score} - ${TIER_LABELS[tier]}! Check your onchain reputation score at`;
               window.open(
                 `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(appUrl)}`,
                 "_blank",
@@ -129,14 +120,9 @@ export function ScoresDashboard() {
 
           <button
             onClick={() => {
-              const tierLabels: Record<string, string> = {
-                bronze: "NEWCOMER",
-                silver: "RISING STAR",
-                gold: "TRUSTED",
-                platinum: "LEGENDARY",
-              };
               const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
-              const text = `My SSA Index is ${scores.ssaIndex?.score} - ${tierLabels[scores.ssaIndex?.tier || "bronze"]}! Check your onchain reputation score at ${appUrl}`;
+              const tier = scores.ssaIndex?.tier || "bronze";
+              const text = `My SSA Index is ${scores.ssaIndex?.score} - ${TIER_LABELS[tier]}! Check your onchain reputation score at ${appUrl}`;
               window.open(
                 `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}`,
                 "_blank",

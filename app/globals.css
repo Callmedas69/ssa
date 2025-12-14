@@ -296,6 +296,7 @@
   border-radius: 0.5rem;
   box-shadow: 4px 4px 0 #2D2A26;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  will-change: transform, box-shadow;
 }
 
 .retro-card:hover {
@@ -340,6 +341,7 @@
   box-shadow: 3px 3px 0 #2D2A26;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
   cursor: pointer;
+  will-change: transform, box-shadow;
 }
 
 .retro-button:hover {

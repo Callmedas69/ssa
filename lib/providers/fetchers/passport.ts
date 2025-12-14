@@ -1,17 +1,23 @@
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
 import type { ProviderConfig, ProviderFetcher, ProviderResult } from '../registry';
+import { getPassportTier } from '@/lib/passportTier';
 
 /**
  * Passport provider configuration
+ *
+ * Note: Passport is excluded from SSA score calculation (includeInScore: false)
+ * because it measures identity verification (sybil resistance), not behavior/reputation.
+ * It is displayed separately as a trust indicator.
  */
 export const passportConfig: ProviderConfig = {
   id: 'passport',
   name: 'Gitcoin Passport',
-  weight: 0.18,
+  weight: 0, // Not included in score calculation
   cap: 100,
   normalization: 'none', // Already 0-100
   inputType: 'address',
   enabled: true,
+  includeInScore: false, // Displayed separately as sybil resistance indicator
 };
 
 interface PassportStamp {
@@ -79,6 +85,7 @@ export const fetchPassport: ProviderFetcher = async (input): Promise<ProviderRes
         passingScore: data.passing_score,
         threshold: parseFloat(data.threshold) || 20,
         stampCount,
+        tier: getPassportTier(score),
       },
     };
   } catch (error) {

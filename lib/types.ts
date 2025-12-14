@@ -62,11 +62,15 @@ export interface QuotientScore {
 }
 
 // Gitcoin Passport Score (Sybil resistance)
+// Note: Passport is displayed separately from SSA score as it measures identity verification, not behavior
+export type PassportTier = 'unverified' | 'verified' | 'trusted' | 'highlyTrusted';
+
 export interface PassportScore {
   score: number; // 0-100
   passingScore: boolean; // true if score >= threshold
   threshold: number; // default 20
   stampCount?: number; // number of stamps
+  tier: PassportTier; // calculated tier based on score
 }
 
 // User Identity (ENS, Basename)

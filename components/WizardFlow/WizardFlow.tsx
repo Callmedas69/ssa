@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { WizardStep } from "./WizardStep";
@@ -13,6 +14,14 @@ import { TipsStep } from "./steps/TipsStep";
 import { ShareStep } from "./steps/ShareStep";
 import { useHasMintedSBT } from "@/hooks/useHasMintedSBT";
 import type { SocialScores, ScoreApiResponse } from "@/lib/types";
+
+// Lazy load AboutModal - only needed on user interaction
+const AboutModal = dynamic(() => import("@/components/AboutModal").then(mod => ({ default: mod.AboutModal })), {
+  ssr: false,
+});
+
+// Step indicator dots - extracted to avoid recreation on each render
+const STEP_NUMBERS = [1, 2, 3, 4, 5, 6, 7] as const;
 
 async function fetchScores(address: string): Promise<SocialScores> {
   try {
@@ -43,6 +52,7 @@ export function WizardFlow() {
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   const { address, isConnected } = useAccount();
   const { hasMinted } = useHasMintedSBT(address);
@@ -207,6 +217,7 @@ export function WizardFlow() {
                   ssaIndex={scores?.ssaIndex?.score ?? null}
                   ssaTier={scores?.ssaIndex?.tier ?? null}
                   hasMintedSBT={hasMinted}
+                  passportScore={scores?.passport?.score ?? null}
                 />
               )}
             </WizardStep>
@@ -230,6 +241,14 @@ export function WizardFlow() {
             >
               <ShareStep scores={scores} />
             </WizardStep>
+
+            {/* About Button - Bottom Right */}
+            <button
+              onClick={() => setIsAboutOpen(true)}
+              className="absolute bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 w-8 h-8 bg-white/80 text-[#2D2A26] text-sm font-bold rounded-full border-2 border-[#2D2A26] shadow-[2px_2px_0_#2D2A26] hover:translate-y-[-1px] hover:shadow-[3px_3px_0_#2D2A26] transition-all duration-150 flex items-center justify-center"
+            >
+              ?
+            </button>
           </div>
         )}
 
@@ -257,7 +276,7 @@ export function WizardFlow() {
 
               {/* Step Indicator Dots - Mobile only */}
               <div className="flex sm:hidden items-center gap-1.5">
-                {[1, 2, 3, 4, 5, 6, 7].map((step) => (
+                {STEP_NUMBERS.map((step) => (
                   <div
                     key={step}
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
@@ -290,6 +309,9 @@ export function WizardFlow() {
           </div>
         )}
       </div>
+
+      {/* About Modal */}
+      <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
     </div>
   );
 }

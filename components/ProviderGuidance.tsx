@@ -137,7 +137,7 @@ export const ProviderGuidance = memo(function ProviderGuidance({
       </button>
 
       <div
-        className={`grid transition-all duration-300 ease-out ${
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
           isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
       >

@@ -6,6 +6,7 @@ import { useFarcaster } from "@/components/FarcasterProvider";
 import type { SocialScores } from "@/lib/types";
 import { CONTRACTS } from "@/abi/addresses";
 import { TIER_LABELS, TIER_MESSAGES } from "@/lib/ssaIndex";
+import { getPassportTierLabel, getPassportTierColor } from "@/lib/passportTier";
 
 interface ShareStepProps {
   scores: SocialScores | undefined;
@@ -48,6 +49,25 @@ export function ShareStep({ scores }: ShareStepProps) {
           <span className="text-xs font-bold text-[#E85D3B] uppercase tracking-wide">
             {TIER_LABELS[currentTier]}
           </span>
+
+          {/* Human Passport */}
+          {scores.passport && (
+            <div className="my-8 flex items-center justify-center gap-2">
+              <span className="text-xs text-[#8B8680]">Human Passport:</span>
+              <span className="text-sm font-bold text-[#2D2A26]">
+                {Math.round(scores.passport.score)}
+              </span>
+              <span
+                className="text-xs font-semibold px-2 py-0.5 rounded"
+                style={{
+                  backgroundColor: getPassportTierColor(scores.passport.score),
+                  color: '#fff'
+                }}
+              >
+                {getPassportTierLabel(scores.passport.score)}
+              </span>
+            </div>
+          )}
         </div>
       )}
 

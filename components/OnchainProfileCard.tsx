@@ -9,6 +9,7 @@ import { useSubmitScores } from "@/hooks/useSubmitScores";
 import type { UserIdentity, SSAIndexTier } from "@/lib/types";
 import { TIER_LABELS } from "@/lib/ssaIndex";
 import { useTheme } from "./ThemeProvider";
+import { getPassportTierLabel, getPassportTierColor } from "@/lib/passportTier";
 
 interface OnchainProfileCardProps {
   address: string;
@@ -16,6 +17,7 @@ interface OnchainProfileCardProps {
   ssaIndex: number | null;
   ssaTier?: SSAIndexTier | null;
   hasMintedSBT?: boolean;
+  passportScore?: number | null;
 }
 
 export function OnchainProfileCard({
@@ -24,6 +26,7 @@ export function OnchainProfileCard({
   ssaIndex,
   ssaTier,
   hasMintedSBT,
+  passportScore,
 }: OnchainProfileCardProps) {
   const { theme } = useTheme();
   const { nextAllowedTime, lastSubmissionTime } = useSubmitScores();
@@ -85,7 +88,7 @@ export function OnchainProfileCard({
 
               <div className="flex items-baseline justify-between gap-4">
                 <span className="text-sm font-bold text-[#2D2A26] uppercase">
-                  SSA Index
+                  TrustCheck
                 </span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg font-bold text-[#2D2A26]">
@@ -96,6 +99,26 @@ export function OnchainProfileCard({
                       {TIER_LABELS[ssaTier]}
                     </span>
                   )}
+                </div>
+              </div>
+
+              <div className="flex items-baseline justify-between gap-4">
+                <span className="text-sm font-bold text-[#2D2A26] uppercase">
+                  Human Passport
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-[#2D2A26]">
+                    {passportScore !== null && passportScore !== undefined ? Math.round(passportScore) : "—"}
+                  </span>
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded"
+                    style={{
+                      backgroundColor: getPassportTierColor(passportScore ?? null),
+                      color: '#fff'
+                    }}
+                  >
+                    {getPassportTierLabel(passportScore ?? null)}
+                  </span>
                 </div>
               </div>
 
@@ -174,7 +197,7 @@ export function OnchainProfileCard({
 
               <div className="flex items-baseline justify-between gap-8">
                 <span className="text-[11px] font-bold text-black uppercase">
-                  SSA Index
+                  TrustCheck
                 </span>
                 <div className="flex items-baseline gap-2">
                   <span className="text-lg font-bold text-black">
@@ -185,6 +208,26 @@ export function OnchainProfileCard({
                       {ssaTier}
                     </span>
                   )}
+                </div>
+              </div>
+
+              <div className="flex items-baseline justify-between gap-8">
+                <span className="text-[11px] font-bold text-black uppercase">
+                  Human Passport
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-bold text-black">
+                    {passportScore !== null && passportScore !== undefined ? Math.round(passportScore) : ":"}
+                  </span>
+                  <span
+                    className="text-[11px] font-bold px-2 py-0.5 rounded"
+                    style={{
+                      backgroundColor: getPassportTierColor(passportScore ?? null),
+                      color: '#fff'
+                    }}
+                  >
+                    {getPassportTierLabel(passportScore ?? null)}
+                  </span>
                 </div>
               </div>
 

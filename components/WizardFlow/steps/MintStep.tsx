@@ -1,6 +1,9 @@
 "use client";
 
+import { useReadContract } from "wagmi";
 import { OnchainProfileCard } from "@/components/OnchainProfileCard";
+import { ProfileSBTABI } from "@/abi/ProfileSBT";
+import { CONTRACTS } from "@/abi/addresses";
 import type { UserIdentity, SSAIndexTier } from "@/lib/types";
 
 interface MintStepProps {
@@ -9,6 +12,7 @@ interface MintStepProps {
   ssaIndex: number | null;
   ssaTier?: SSAIndexTier | null;
   hasMintedSBT?: boolean;
+  passportScore?: number | null;
 }
 
 export function MintStep({
@@ -17,7 +21,15 @@ export function MintStep({
   ssaIndex,
   ssaTier,
   hasMintedSBT,
+  passportScore,
 }: MintStepProps) {
+  const { data: totalSupply } = useReadContract({
+    address: CONTRACTS.ProfileSBT as `0x${string}`,
+    abi: ProfileSBTABI,
+    functionName: "totalSupply",
+    query: { staleTime: 1000 * 60 * 60 }, // 1 hour - totalSupply rarely changes
+  });
+
   return (
     <div className="space-y-8">
       {/* Introduction Text */}
@@ -27,7 +39,7 @@ export function MintStep({
         </h3>
         <p className="text-[#8B8680] text-sm max-w-md mx-auto italic">
           Attest your scores to the blockchain
-        <br />  
+        <br />
         Mint your unique Soulbound Token (SBT).
         </p>
       </div>
@@ -43,6 +55,7 @@ export function MintStep({
           ssaIndex={ssaIndex}
           ssaTier={ssaTier}
           hasMintedSBT={hasMintedSBT}
+          passportScore={passportScore}
         />
       </div>
 
@@ -53,6 +66,11 @@ export function MintStep({
             ? "First, attest your scores onchain. Then mint your SBT Profile."
             : "You can update your scores again after 24 hours."}
         </p>
+        {totalSupply !== undefined && (
+          <p className="text-[10px] text-[#8B8680] mt-2 italic">
+            {totalSupply.toString()} attested
+          </p>
+        )}
       </div>
     </div>
   );

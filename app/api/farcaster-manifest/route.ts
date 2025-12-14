@@ -14,8 +14,8 @@ export async function GET() {
       name: "TRUSTCHECK",
       subtitle: "Onchain Reputation Score",
       description:
-        "Your aggreagated reputation score. Attest onchain and mint SBT on Base.",
-      iconUrl: `${appUrl}/ssa_logo_v2.svg`,
+        "Your aggregated reputation score. Attest onchain and mint SBT on Base.",
+      iconUrl: `${appUrl}/iconLogo.svg`,
       homeUrl: appUrl,
       imageUrl: `${appUrl}/api/og`,
       buttonTitle: "Check Score",
@@ -29,7 +29,7 @@ export async function GET() {
       // OpenGraph
       ogTitle: "TRUSTCHECK",
       ogDescription:
-        "Your aggreagated reputation score. Attest onchain and mint SBT on Base.",
+        "Your aggregated reputation score. Attest onchain and mint SBT on Base.",
       ogImageUrl: `${appUrl}/api/og`,
       // Required chains and capabilities
       requiredChains: ["eip155:8453"], // Base mainnet

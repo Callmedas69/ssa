@@ -87,6 +87,7 @@ function toLegacyFormat(
       passingScore: passportResult.metadata?.passingScore as boolean,
       threshold: passportResult.metadata?.threshold as number,
       stampCount: passportResult.metadata?.stampCount as number | undefined,
+      tier: passportResult.metadata?.tier as import('@/lib/types').PassportTier,
     } : null,
   };
 }

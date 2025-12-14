@@ -31,6 +31,8 @@ export interface ProviderConfig {
   dependsOn?: string;
   /** Whether this provider is currently enabled */
   enabled: boolean;
+  /** Whether to include this provider in SSA score calculation (default: true) */
+  includeInScore?: boolean;
 }
 
 /**
@@ -99,6 +101,14 @@ class ProviderRegistry {
    */
   getEnabled(): RegisteredProvider[] {
     return this.getAll().filter(p => p.enabled);
+  }
+
+  /**
+   * Get providers that should be included in SSA score calculation
+   * Excludes providers with includeInScore: false (e.g., Passport)
+   */
+  getForScoring(): RegisteredProvider[] {
+    return this.getEnabled().filter(p => p.includeInScore !== false);
   }
 
   /**

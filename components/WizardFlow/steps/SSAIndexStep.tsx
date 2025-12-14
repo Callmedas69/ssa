@@ -3,7 +3,11 @@
 import { useState, useEffect } from "react";
 import type { SocialScores } from "@/lib/types";
 import { TIERS, TIER_LABELS, TIER_MESSAGES } from "@/lib/ssaIndex";
+import { config } from "@/lib/config";
 import { Badge } from "@/components/ui/badge";
+import { getPassportTierLabel, getPassportTierColor } from "@/lib/passportTier";
+
+const { tiers } = config.ssaIndex;
 
 interface SSAIndexStepProps {
   scores: SocialScores | undefined;
@@ -87,11 +91,7 @@ export function SSAIndexStep({ scores, isLoading, error }: SSAIndexStepProps) {
             <div className="pt-2">
               <span className="inline-block text-sm sm:text-base font-bold text-white uppercase tracking-wide px-4 py-2 rounded-lg border-2 border-[#2D2A26] shadow-[2px_2px_0_#2D2A26]"
                 style={{
-                  backgroundColor:
-                    scores.ssaIndex.tier === "platinum" ? "#2A9D8F" :
-                    scores.ssaIndex.tier === "gold" ? "#F4A261" :
-                    scores.ssaIndex.tier === "silver" ? "#E85D3B" :
-                    "#8B8680"
+                  backgroundColor: tiers[scores.ssaIndex.tier].color
                 }}
               >
                 {TIER_LABELS[scores.ssaIndex.tier]}
@@ -101,11 +101,35 @@ export function SSAIndexStep({ scores, isLoading, error }: SSAIndexStepProps) {
 
           {/* Tier Legend */}
           <div className="flex justify-center gap-1.5 pt-4 flex-wrap">
-            <Badge variant="retro" className="bg-[#8B8680] text-white border-[#2D2A26]">{TIERS.bronze.min}-{TIERS.bronze.max} {TIER_LABELS.bronze}</Badge>
-            <Badge variant="retro" className="bg-[#E85D3B] text-white border-[#2D2A26]">{TIERS.silver.min}-{TIERS.silver.max} {TIER_LABELS.silver}</Badge>
-            <Badge variant="retro" className="bg-[#F4A261] text-white border-[#2D2A26]">{TIERS.gold.min}-{TIERS.gold.max} {TIER_LABELS.gold}</Badge>
-            <Badge variant="retro" className="bg-[#2A9D8F] text-white border-[#2D2A26]">{TIERS.platinum.min}+ {TIER_LABELS.platinum}</Badge>
+            <Badge variant="retro" className="text-white border-[#2D2A26]" style={{ backgroundColor: tiers.bronze.color }}>{TIERS.bronze.min}-{TIERS.bronze.max} {TIER_LABELS.bronze}</Badge>
+            <Badge variant="retro" className="text-white border-[#2D2A26]" style={{ backgroundColor: tiers.silver.color }}>{TIERS.silver.min}-{TIERS.silver.max} {TIER_LABELS.silver}</Badge>
+            <Badge variant="retro" className="text-white border-[#2D2A26]" style={{ backgroundColor: tiers.gold.color }}>{TIERS.gold.min}-{TIERS.gold.max} {TIER_LABELS.gold}</Badge>
+            <Badge variant="retro" className="text-white border-[#2D2A26]" style={{ backgroundColor: tiers.platinum.color }}>{TIERS.platinum.min}+ {TIER_LABELS.platinum}</Badge>
           </div>
+
+          {/* Passport Sybil Resistance - displayed separately */}
+          {scores.passport && (
+            <div className="mt-6 pt-6 border-t-2 border-[#2D2A26]/10">
+              <p className="text-[10px] text-[#8B8680] uppercase tracking-wider mb-2">
+                Sybil Resistance
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-sm text-[#2D2A26]">Human Passport:</span>
+                <span
+                  className="text-sm font-semibold px-3 py-1 rounded"
+                  style={{
+                    backgroundColor: getPassportTierColor(scores.passport.score),
+                    color: '#fff'
+                  }}
+                >
+                  {getPassportTierLabel(scores.passport.score)}
+                </span>
+                <span className="text-sm text-[#8B8680]">
+                  ({Math.round(scores.passport.score)}/100)
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="text-center py-8">

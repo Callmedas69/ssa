@@ -7,7 +7,7 @@ import type { ProviderConfig, ProviderFetcher, ProviderResult } from '../registr
 export const ethosConfig: ProviderConfig = {
   id: 'ethos',
   name: 'Ethos',
-  weight: 0.20,
+  weight: 0.24,
   cap: 2800,
   normalization: 'divide',
   inputType: 'address',
