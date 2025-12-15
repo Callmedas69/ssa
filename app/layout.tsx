@@ -25,7 +25,7 @@ const miniAppEmbed = {
   version: "1",
   imageUrl: `${appUrl}/api/og`,
   button: {
-    title: "TrustCheck",
+    title: "Attest",
     action: {
       type: "launch_miniapp",
       name: "TRUSTCHECK",

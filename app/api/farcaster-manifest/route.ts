@@ -15,10 +15,10 @@ export async function GET() {
       subtitle: "Onchain Reputation Score",
       description:
         "Your aggregated reputation score. Attest onchain and mint SBT on Base.",
-      iconUrl: `${appUrl}/iconLogo.svg`,
+      iconUrl: `${appUrl}/iconLogo.png`,
       homeUrl: appUrl,
       imageUrl: `${appUrl}/api/og`,
-      buttonTitle: "Check Score",
+      buttonTitle: "Attest",
       splashImageUrl: `${appUrl}/splash.png`,
       splashBackgroundColor: "#FFFFFF",
       // Discovery metadata
