@@ -2,20 +2,32 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useReadContract } from "wagmi";
 import { useFarcaster } from "@/components/FarcasterProvider";
 import type { SocialScores } from "@/lib/types";
 import { CONTRACTS } from "@/abi/addresses";
+import { ProfileSBTABI } from "@/abi/ProfileSBT";
 import { TIER_LABELS, TIER_MESSAGES } from "@/lib/ssaIndex";
 import { getPassportTierLabel, getPassportTierColor } from "@/lib/passportTier";
 
 interface ShareStepProps {
   scores: SocialScores | undefined;
+  address?: `0x${string}`;
 }
 
-export function ShareStep({ scores }: ShareStepProps) {
+export function ShareStep({ scores, address }: ShareStepProps) {
   const [copied, setCopied] = useState(false);
   const { isInFarcaster, composeCast } = useFarcaster();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://trustcheck.geoart.studio";
+
+  // Query tokenID for OpenSea link
+  const { data: tokenId } = useReadContract({
+    address: CONTRACTS.ProfileSBT as `0x${string}`,
+    abi: ProfileSBTABI,
+    functionName: "getProfileTokenId",
+    args: address ? [address] : undefined,
+    query: { enabled: !!address },
+  });
 
   const currentTier = scores?.ssaIndex?.tier || "bronze";
   const shareUrl = appUrl;
@@ -130,7 +142,9 @@ export function ShareStep({ scores }: ShareStepProps) {
           {/* Collection Links - Secondary actions */}
           <div className="flex items-center justify-center gap-4 pt-2 text-xs text-[#8B8680]">
             <a
-              href={`https://opensea.io/collection/trust-check`}
+              href={tokenId
+                ? `https://opensea.io/item/base/${CONTRACTS.ProfileSBT}/${tokenId}`
+                : `https://opensea.io/collection/trust-check`}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-[#2D2A26] underline transition-colors flex items-center gap-1 cursor-pointer"

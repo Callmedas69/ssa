@@ -239,7 +239,7 @@ export function WizardFlow() {
               direction={direction}
               onAnimationComplete={handleAnimationComplete}
             >
-              <ShareStep scores={scores} />
+              <ShareStep scores={scores} address={address} />
             </WizardStep>
 
             {/* About Button - Bottom Right */}

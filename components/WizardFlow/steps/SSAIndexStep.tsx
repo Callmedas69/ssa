@@ -86,19 +86,6 @@ export function SSAIndexStep({ scores, isLoading, error }: SSAIndexStepProps) {
             />
           </div>
 
-          {/* Tier Badge */}
-          {scores.ssaIndex.tier && (
-            <div className="pt-2">
-              <span className="inline-block text-sm sm:text-base font-bold text-white uppercase tracking-wide px-4 py-2 rounded-lg border-2 border-[#2D2A26] shadow-[2px_2px_0_#2D2A26]"
-                style={{
-                  backgroundColor: tiers[scores.ssaIndex.tier].color
-                }}
-              >
-                {TIER_LABELS[scores.ssaIndex.tier]}
-              </span>
-            </div>
-          )}
-
           {/* Tier Legend */}
           <div className="flex justify-center gap-1.5 pt-4 flex-wrap">
             <Badge variant="retro" className="text-white border-[#2D2A26]" style={{ backgroundColor: tiers.bronze.color }}>{TIERS.bronze.min}-{TIERS.bronze.max} {TIER_LABELS.bronze}</Badge>
