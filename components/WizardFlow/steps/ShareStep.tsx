@@ -89,7 +89,7 @@ export function ShareStep({ scores, address }: ShareStepProps) {
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
             <button
               onClick={() => {
-                const text = `My TrustCheck is ${scores.ssaIndex?.score} i am a ${TIER_LABELS[currentTier]}!\n\nCheck your onchain reputation score and mint your SBT\n\n`;
+                const text = `My TrustCheck is ${scores.ssaIndex?.score}, I'm ${TIER_LABELS[currentTier]}!\n\n5 reputation sources. 1 verified score. Onchain forever.\n\nWhat's yours?\n\n`;
                 window.open(
                   `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`,
                   "_blank",
@@ -106,7 +106,7 @@ export function ShareStep({ scores, address }: ShareStepProps) {
 
             <button
               onClick={async () => {
-                const text = `My TrustCheck is ${scores.ssaIndex?.score} i am a ${TIER_LABELS[currentTier]}!\n\ncheck your onchain reputation score and mint your SBT`;
+                const text = `My TrustCheck is ${scores.ssaIndex?.score}, I'm ${TIER_LABELS[currentTier]}!\n\n5 reputation sources. 1 verified score. Onchain forever.\n\nWhat's yours?`;
 
                 if (isInFarcaster) {
                   // Use SDK composeCast - stays in Farcaster
