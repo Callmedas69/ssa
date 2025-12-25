@@ -76,6 +76,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <meta name="apple-mobile-web-app-title" content="TrustCheck" />
+      <meta name="base:app_id" content="694d6917c63ad876c9081321" />
       <body className={`antialiased ${luckiestGuy.variable} ${ubuntu.className}`}>
         <WagmiQueryProviders>
           <FarcasterProvider>
